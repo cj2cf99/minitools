@@ -113,7 +113,7 @@ export function mount(root) {
 		const mine = ++seq;
 		refreshBtn.classList.add('spin');
 		try {
-			const res = await fetch('/api/fx', { cache: 'no-store' });
+			const res = await fetch('api/fx', { cache: 'no-store' });
 			if (!res.ok) throw Error();
 			const data = await res.json();
 			if (mine !== seq) return;

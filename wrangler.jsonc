@@ -4,7 +4,8 @@
 	"account_id": "a859d920747d1015f9ae43e7965183c3",
 	"main": "worker.js",
 	"compatibility_date": "2026-10-27",
-	"workers_dev": true,
+	// 只经主站 /minitools/ 访问（服务绑定），登录校验和页头都在主站
+	"workers_dev": false,
 	// 主站 D1，只读使用；remote 让本地开发也读线上这张表
 	"d1_databases": [{ "binding": "DB", "database_name": "stockanalysis", "database_id": "526927d5-04d5-4fdc-ad49-4a34287e563a", "remote": true }],
 	"assets": { "directory": "public", "binding": "ASSETS", "run_worker_first": ["/api/*"] }
