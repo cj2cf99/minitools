@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "minitools", "runtimeExecutable": "npm.cmd", "runtimeArgs": ["run", "dev"], "port": 8799 }
+  ]
+}
