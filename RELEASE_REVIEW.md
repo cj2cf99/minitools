@@ -73,3 +73,9 @@
 - 现在只经主站 `/minitools/` 服务绑定访问：`workers_dev` 改 false；删除自带页头、主题和公用动画（`public/shell.css` 换成 `public/page.css`）；`api/fx` 改相对路径；工具页增加返回入口。
 - 上一版记录的公开访问风险随之消除：访问需通过主站 Access。部署后原 `minitools.cj2cf99.workers.dev` 地址失效。
 - 检测：`npm test` 4/4；经主站合成环境验证页头、换算和窄屏。真实绑定上线后验证。
+
+### 修复实际发布结果
+
+- Worker 版本 `7df1c259-4cbb-4acb-b850-02dd5af79ae8`，UTC 2026-11-08T09:50:34Z，100% 流量，已关闭 workers.dev，原公开地址返回 404。
+- 主站 Worker `ea256170-cf4a-46db-aa45-02c83370da53` 经服务绑定访问，匿名请求被 Access 拦到登录页。
+- 花园已登记（主站记录 `minitools-release-garden-20261108`）。Access 登录后的效果待用户确认。
