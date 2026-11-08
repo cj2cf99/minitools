@@ -5,82 +5,71 @@ const inGroup = (group) => TOOLS.filter((t) => t.group === group.id);
 const groups = GROUPS.filter((g) => inGroup(g).length);
 const tone = (g) => `style="--tone:var(--t-${g.tone})"`;
 const currentId = () => location.hash.replace(/^#\/?/, '');
-const HOME_ICON = '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>';
+const HOME_ICON = '<path d="M12.8 12.6 3 22M16.5 11.3v5.6M20.2 12.6v2.4"/><circle cx="16.5" cy="18.8" r=".9"/><circle cx="20.2" cy="16.9" r=".9"/><path d="M14.27 4.43A2.4 2.4 0 1 1 18.73 4.43 2.4 2.4 0 1 1 20.11 8.67 2.4 2.4 0 1 1 16.5 11.3 2.4 2.4 0 1 1 12.89 8.67 2.4 2.4 0 1 1 14.27 4.43z"/><circle cx="16.5" cy="7.5" r="1.1"/>'; // 发簪
 
-const header = document.querySelector('header.unified-header');
-const desktop = header.querySelector('.site-navigation');
-const nav = desktop.querySelector('nav');
-const toggle = header.querySelector('.site-menu-toggle');
-const drawer = document.getElementById('site-drawer');
 const view = document.getElementById('view');
-const mobile = matchMedia('(max-width:767px)');
-
-/* 导航：一棵链接树，桌面下拉与手机抽屉共用（同主站 shell/navigation.js） */
-nav.innerHTML = `<div class="nav-home"><div class="nav-entry"><a data-nav="" href="#/">总览</a></div></div>` + groups.map((g) => `
-	<details class="nav-group" data-nav-group="${g.id}" ${tone(g)}>
-		<summary>${g.label}<span aria-hidden="true">⌄</span></summary>
-		<div class="nav-dropdown">${inGroup(g).map((t) => `
-			<div class="nav-entry"><a data-nav="${t.id}" href="#/${t.id}"><b class="tool-icon">${svg(t.icon)}</b>${t.name}<small>${t.desc}</small></a></div>`).join('')}
-		</div>
-	</details>`).join('');
-
-const navGroups = [...nav.querySelectorAll('.nav-group')];
-const closeGroups = () => navGroups.forEach((g) => { g.open = false; });
-const closeDrawer = () => { if (drawer.open) drawer.close(); };
-
-drawer.addEventListener('close', () => {
-	desktop.append(nav);
-	toggle.setAttribute('aria-expanded', 'false');
-	closeGroups();
-	if (mobile.matches) toggle.focus();
-});
-toggle.addEventListener('click', () => {
-	drawer.querySelector('.drawer-body').append(nav);
-	navGroups.forEach((g) => { g.open = true; });
-	drawer.showModal();
-	toggle.setAttribute('aria-expanded', 'true');
-});
-drawer.querySelector('.drawer-close').addEventListener('click', closeDrawer);
-drawer.addEventListener('click', (e) => { if (e.target === drawer) closeDrawer(); });
-navGroups.forEach((group) => group.querySelector('summary').addEventListener('click', (e) => {
-	if (drawer.open) return e.preventDefault();
-	navGroups.forEach((other) => { if (other !== group) other.open = false; });
-}));
-document.addEventListener('click', (e) => {
-	if (!header.contains(e.target) && !drawer.contains(e.target)) closeGroups();
-	if (e.target.closest('.nav-entry a')) { closeDrawer(); closeGroups(); }
-});
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !drawer.open) closeGroups(); });
-mobile.addEventListener('change', () => { closeDrawer(); closeGroups(); });
 
 /* 风格切换：选择只存本机浏览器（同主站键名，但不同域名不互通） */
-header.querySelector('.theme-toggle').addEventListener('click', () => {
-	const root = document.documentElement;
-	root.dataset.theme = root.dataset.theme === 'ink' ? 'cyber' : 'ink';
-	try { localStorage.setItem('ui-theme', root.dataset.theme); } catch {}
+const root = document.documentElement;
+document.querySelector('.theme-toggle').addEventListener('click', (e) => {
+	const next = root.dataset.theme === 'cyber' ? 'ink' : 'cyber';
+	try { localStorage.setItem('ui-theme', next); } catch {}
+	const swap = () => { root.dataset.theme = next; };
+	if (!document.startViewTransition) {
+		root.classList.add('theme-switching');
+		swap();
+		setTimeout(() => root.classList.remove('theme-switching'), 500);
+		return;
+	}
+	const r = e.currentTarget.getBoundingClientRect(); // 从按钮位置圆形扩散
+	root.style.setProperty('--vt-x', `${r.left + r.width / 2}px`);
+	root.style.setProperty('--vt-y', `${r.top + r.height / 2}px`);
+	root.classList.add('t-theme-vt');
+	document.startViewTransition(swap).finished.finally(() => root.classList.remove('t-theme-vt'));
 });
 
-addEventListener('scroll', () => document.documentElement.classList.toggle('t-scrolled', scrollY > 8), { passive: true });
+/* 动效：滚动浮现、点击涟漪、页头滚动状态（同主站 shell/theme.js） */
+addEventListener('scroll', () => root.classList.toggle('t-scrolled', scrollY > 8), { passive: true });
+
+const seen = new IntersectionObserver((entries) => {
+	for (const { target, isIntersecting } of entries) if (isIntersecting) show(target);
+}, { rootMargin: '0px 0px -6% 0px' });
+function show(el) {
+	if (el.classList.contains('t-in')) return;
+	seen.unobserve(el);
+	el.classList.add('t-in');
+	// 浮现结束后去掉，恢复元素自身的悬停过渡
+	setTimeout(() => { el.classList.remove('t-reveal', 't-in'); }, 950 + parseInt(el.style.getPropertyValue('--t-delay')));
+}
+function reveal() {
+	for (const el of view.querySelectorAll('.portal,.field,.rates')) {
+		el.style.setProperty('--t-delay', `${Math.min([...el.parentElement.children].indexOf(el), 6) * 40}ms`);
+		el.classList.add('t-reveal');
+		seen.observe(el);
+	}
+}
+document.addEventListener('pointerdown', (e) => {
+	const el = e.target.closest?.('.portal,.refresh');
+	if (!el) return;
+	const r = el.getBoundingClientRect();
+	el.style.setProperty('--t-rx', `${e.clientX - r.left}px`);
+	el.style.setProperty('--t-ry', `${e.clientY - r.top}px`);
+	el.classList.remove('t-ripple');
+	void el.offsetWidth; // 重启涟漪
+	el.classList.add('t-ripple');
+}, { passive: true });
+document.addEventListener('animationend', (e) => { if (e.animationName === 't-ripple') e.target.classList.remove('t-ripple'); });
 
 /* 页面 */
-function markCurrent(id) {
-	nav.querySelectorAll('[data-nav]').forEach((a) => {
-		if (a.dataset.nav === id) a.setAttribute('aria-current', 'page');
-		else a.removeAttribute('aria-current');
-	});
-	navGroups.forEach((g) => { g.dataset.current = String(!!g.querySelector('[aria-current]')); });
-	nav.querySelector('.nav-home').dataset.current = String(id === '');
-}
-
 function renderHome() {
-	view.innerHTML = `<div class="page-head"><h1><b class="page-ico">${svg(HOME_ICON)}</b>饰品总览</h1><span class="count">${TOOLS.length}</span></div>` + groups.map((g) => `
+	view.innerHTML = `<div class="page-head"><h1><b class="page-ico">${svg(HOME_ICON)}</b>饰品铺子</h1><span class="count">${TOOLS.length}</span></div>` + groups.map((g) => `
 		<section class="tool-section" ${tone(g)}>
 			<h2>${g.label}</h2>
 			<div class="portals">${inGroup(g).map((t) => `
-				<a class="portal" href="#/${t.id}">
+				<a class="portal" href="#/${t.id}" aria-label="${t.name}" title="${t.name}：${t.desc}">
+					<span class="portal-surface" aria-hidden="true"></span>
 					<b class="tool-icon">${svg(t.icon)}</b>
-					<span class="portal-copy"><strong>${t.name}</strong><small>${t.desc}</small></span>
-					<i class="enter" aria-hidden="true">${svg('<path d="M5 12h14M13 6l6 6-6 6"/>')}</i>
+					<span class="portal-label">${t.name}</span>
 				</a>`).join('')}
 			</div>
 		</section>`).join('');
@@ -100,17 +89,17 @@ async function route() {
 	const tool = TOOLS.find((t) => t.id === id);
 	unmount?.();
 	unmount = null;
-	closeGroups();
-	markCurrent(tool ? id : '');
-	document.title = tool ? `${tool.name} · 饰品库` : '饰品库';
-	view.classList.remove('enter');
-	void view.offsetWidth; // 重启入场动画
-	view.classList.add('enter');
-	if (!tool) return renderHome();
+	document.title = tool ? `${tool.name} · 饰品铺子` : '饰品铺子';
+	if (!tool) {
+		renderHome();
+		return reveal();
+	}
 	view.innerHTML = `<div class="page-head"><h1><b class="page-ico">${svg(tool.icon)}</b>${tool.name}</h1></div><div id="tool"></div>`;
 	const [{ mount }] = await Promise.all([import(`./tools/${id}.js`), loadCss(id)]); // 进入时才加载
-	if (currentId() === id) unmount = mount(document.getElementById('tool'));
+	if (currentId() !== id) return;
+	unmount = mount(document.getElementById('tool'));
+	reveal();
 }
 
-addEventListener('hashchange', route);
+addEventListener('hashchange', () => { if (document.startViewTransition) document.startViewTransition(route); else route(); });
 route();
