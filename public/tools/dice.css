@@ -1,0 +1,273 @@
+.page-head[data-tool=dice], .dice-tool {
+  --dice-ink: var(--t-ink, #1d2f37);
+  --dice-muted: var(--t-muted, #5a6e77);
+  --dice-line: var(--t-line, #d5e3e3);
+  --dice-surface: var(--t-surface, #fcfefd);
+  --dice-tint: var(--t-brand-soft, #e0f0ec);
+  --dice-accent: var(--t-brand-ink, #286760);
+  --dice-danger: var(--t-danger, #a12b36);
+  --dice-flat: #69399d;
+  --dice-solid: #26756a;
+  --dice-mono: "Cascadia Mono", Consolas, monospace;
+  max-width: 848px;
+  margin-inline: auto;
+  color: var(--dice-ink);
+  font-family: var(--t-font, system-ui, sans-serif);
+}
+.page-head[data-tool=dice] { position: relative; gap: 8px; margin-bottom: 10px; }
+.page-head[data-tool=dice] h1, .page-head[data-tool=dice] .back { flex: none; white-space: nowrap; }
+.page-head[data-tool=dice]:has(.dice-disclosure[open]) { z-index: 2; }
+html[data-theme=cyber] .page-head[data-tool=dice] {
+  --dice-flat: #d9b9fc;
+  --dice-solid: #a8e4d4;
+}
+.dice-tool *, .dice-tool *::before, .dice-tool *::after, .dice-disclosure * { box-sizing: border-box; }
+.dice-tool p, .dice-disclosure p { margin: 0; }
+
+.dice-disclosure { flex: none; }
+.dice-disclosure > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 1px solid var(--dice-line);
+  border-radius: 8px;
+  background: var(--dice-surface);
+  color: var(--dice-muted);
+  list-style: none;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.dice-disclosure > summary::-webkit-details-marker { display: none; }
+.dice-disclosure > summary::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(-45deg);
+  transition: transform .18s ease;
+}
+.dice-disclosure[open] > summary::after { transform: rotate(45deg); }
+#dice-settings .range-summary { font: 610 13px var(--dice-mono); color: var(--dice-accent); }
+.dice-disclosure .dice-panel {
+  position: absolute;
+  inset: calc(100% + 4px) auto auto 0;
+  width: max-content;
+  max-width: 100%;
+  padding: 8px;
+  border: 1px solid var(--dice-line);
+  border-radius: 12px;
+  background: var(--dice-surface);
+  box-shadow: var(--t-shadow, 0 8px 20px #17253825);
+}
+#dice-settings .settings-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+#dice-settings .bounds {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--dice-line);
+  border-radius: 11px;
+  background: var(--dice-surface);
+  box-shadow: inset 0 1px #ffffff08;
+}
+#dice-settings .bounds label { display: grid; gap: 3px; color: var(--dice-muted); font-size: 12px; }
+#dice-settings .bounds input {
+  width: 69px;
+  min-height: 25px;
+  padding: 1px 5px;
+  margin-left: -5px;
+  appearance: textfield;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--dice-ink);
+  font: 640 24px/1 var(--dice-mono);
+  outline-offset: 1px;
+}
+#dice-settings .bounds input::-webkit-inner-spin-button, #dice-settings .bounds input::-webkit-outer-spin-button { appearance: none; margin: 0; }
+#dice-settings .bounds input[aria-invalid="true"] { color: var(--dice-danger); text-decoration: underline; text-underline-offset: 4px; }
+#dice-settings .bounds input:disabled { opacity: 1; }
+.dice-tool #roll-button {
+  /* 原生提交控件保持固定宽度，主站按钮皮肤读取当前骰台的颜色。 */
+  --t-btn-bg: var(--t-dice-button-bg);
+  --t-btn-line: var(--t-dice-button-line);
+  --t-ink: var(--t-dice-button-ink);
+  appearance: none;
+  width: 104px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--t-btn-line) !important;
+  border-radius: var(--t-dice-corner) !important;
+  background: var(--t-btn-bg);
+  color: var(--t-ink);
+  box-shadow: var(--t-dice-button-shadow) !important;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.dice-tool #roll-button:disabled { cursor: wait; opacity: .72; }
+.dice-tool #roll-button:not(:disabled):active { filter: brightness(.96); }
+@media (hover: hover) {
+  .dice-tool #roll-button:hover:not(:disabled, :active) { filter: brightness(1.08); }
+}
+.dice-tool :focus-visible, .dice-disclosure :focus-visible { outline: 2px solid var(--dice-accent); outline-offset: 3px; }
+.dice-tool .dice-error, #dice-settings .dice-error { margin-top: 6px; padding: 6px 8px; border-radius: 6px; color: var(--dice-danger); font-size: 13px; }
+
+#dice-settings .dice-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+#dice-settings .mode-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid var(--dice-line);
+  border-radius: 10px;
+  background: var(--dice-surface);
+}
+#dice-settings .mode-option { --mode-color: var(--dice-flat); position: relative; min-width: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+#dice-settings .mode-option:last-child { --mode-color: var(--dice-solid); }
+#dice-settings .mode-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--dice-muted);
+  font-size: 14px;
+  font-weight: 620;
+  white-space: nowrap;
+  transition: color .16s, background .16s, border-color .16s;
+}
+#dice-settings .mode-code { color: var(--mode-color); font: 700 12px var(--dice-mono); }
+#dice-settings .mode-option:hover .mode-body { background: var(--dice-tint); }
+#dice-settings .mode-option input:checked + .mode-body {
+  border-color: color-mix(in srgb, var(--mode-color) 45%, var(--dice-line));
+  background: color-mix(in srgb, var(--mode-color) 12%, var(--dice-surface));
+  color: var(--dice-ink);
+}
+#dice-settings .mode-option input:focus-visible + .mode-body { outline: 2px solid var(--dice-accent); outline-offset: 2px; }
+
+.dice-tool .stage {
+  position: relative;
+  isolation: isolate;
+  padding-bottom: 40px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--t-dice-stage-line);
+  border-radius: 16px;
+  background: var(--t-dice-stage-bg);
+  box-shadow: var(--t-shadow, 0 8px 20px #17253825);
+  transition: border-color .22s;
+}
+/* 控制区沿用当前骰台的配色，主站主题作用于骰台外围。 */
+.dice-tool .flat {
+  --t-dice-stage-line: #a67cd1;
+  --t-dice-stage-bg: #e1c5f8;
+  --t-dice-stage-accent: #69399d;
+  --t-dice-hud-bg: #eddbfa;
+  --t-dice-hud-ink: #38254e;
+  --t-dice-hud-shadow: 0 2px 0 #9c76c0, 0 4px 12px #50346b29;
+  --t-dice-button-bg: linear-gradient(165deg, #d9b7fb, #ac80e9);
+  --t-dice-button-line: #583b75;
+  --t-dice-button-ink: #291a3b;
+  --t-dice-button-shadow: inset 0 1px #f8e7ff, 0 2px 0 #583b75;
+  --t-dice-corner: 8px;
+}
+.dice-tool .solid {
+  --t-dice-stage-line: #42635c;
+  --t-dice-stage-bg: #192d2e;
+  --t-dice-stage-accent: #a2e4cf;
+  --t-dice-hud-bg: linear-gradient(160deg, #304f48, #1a2e2d);
+  --t-dice-hud-ink: #e4f1e9;
+  --t-dice-hud-shadow: inset 0 1px #a9d7c13b, 0 4px 14px #0b1617a0;
+  --t-dice-button-bg: linear-gradient(165deg, #436b63, #24413d);
+  --t-dice-button-line: #82a99d;
+  --t-dice-button-ink: #effcf5;
+  --t-dice-button-shadow: inset 0 1px #b9e4d25c, 0 2px 7px #0a1718a0;
+  --t-dice-corner: 11px;
+}
+.dice-tool .stage.is-rolling { border-color: var(--t-dice-stage-accent); }
+.dice-tool .dice-scene { position: relative; aspect-ratio: 1.78; max-height: max(240px, calc(100svh - 225px)); }
+.dice-tool .dice-scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.dice-tool .dice-scene::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 20px;
+  background: linear-gradient(transparent, var(--t-dice-stage-bg));
+  pointer-events: none;
+}
+
+.dice-tool .dice-actions {
+  position: absolute;
+  inset: auto 0 10px;
+  width: max-content;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid var(--t-dice-stage-line);
+  border-radius: calc(var(--t-dice-corner) + 4px);
+  background: var(--t-dice-hud-bg);
+  box-shadow: var(--t-dice-hud-shadow);
+}
+.dice-tool .roll-result { display: flex; align-items: center; gap: 8px; color: var(--t-dice-hud-ink); font-size: 13px; white-space: nowrap; }
+.dice-tool .result-number { display: grid; place-items: center; min-width: 2.4ch; font: 700 32px/1 var(--dice-mono); }
+.dice-tool .is-revealed .result-number { animation: dice-land-result .44s cubic-bezier(.18,.6,.24,1) both; }
+@keyframes dice-land-result { 0% { transform: scale(.94); filter: brightness(1.28); } 47% { transform: scale(1.025); } }
+
+#result-details .result-details-content { display: grid; gap: 5px; color: var(--dice-muted); font: 13px/1.5 var(--dice-mono), sans-serif; }
+#result-details [data-dice] { display: flex; flex-wrap: wrap; gap: 4px; }
+#result-details .face-token { padding: 2px 6px; border: 1px solid var(--dice-line); border-radius: 5px; background: var(--dice-surface); white-space: nowrap; }
+
+@media (max-width: 760px) {
+  #dice-settings .mode-body { padding-inline: 7px; }
+  .dice-tool .dice-scene {
+    height: max(clamp(220px, 41vh, 362px), calc(56vw - 15px));
+    height: max(clamp(220px, 41svh, 362px), calc(56vw - 15px));
+    aspect-ratio: auto;
+  }
+}
+@media (max-width: 460px) {
+  .page-head[data-tool=dice] .back { justify-content: center; width: 36px; padding: 0; }
+  .page-head[data-tool=dice] .back span { display: none; }
+}
+@media (max-width: 380px) {
+  .page-head[data-tool=dice] { gap: 4px; }
+  .dice-disclosure > summary { padding-inline: 5px; }
+  .page-head[data-tool=dice]:has(#result-details:not([hidden])) #dice-settings > summary {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0;
+    min-width: 44px;
+  }
+  .page-head[data-tool=dice]:has(#result-details:not([hidden])) .dice-disclosure > summary::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dice-tool .stage, #dice-settings .mode-body, .dice-disclosure > summary::after { transition-duration: .12s; }
+  .dice-tool .is-revealed .result-number { animation-duration: .18s; }
+}

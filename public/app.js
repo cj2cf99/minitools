@@ -1,6 +1,9 @@
 import { GROUPS, TOOLS } from './tools/index.js';
 
 const svg = (paths) => `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;
+const iconMask = (paths) => `url("data:image/svg+xml,${encodeURIComponent(
+	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`,
+)}")`;
 const inGroup = (group) => TOOLS.filter((t) => t.group === group.id);
 const groups = GROUPS.filter((g) => inGroup(g).length);
 const tone = (g) => `style="--tone:var(--t-${g.tone})"`;
@@ -34,12 +37,15 @@ function renderHome() {
 		</section>`).join('');
 }
 
+const toolStyles = new Map();
 function loadCss(id) {
-	if (document.getElementById(`css-${id}`)) return null;
-	return new Promise((done) => {
-		const link = Object.assign(document.createElement('link'), { id: `css-${id}`, rel: 'stylesheet', href: `tools/${id}.css`, onload: done, onerror: done });
-		document.head.append(link);
-	});
+	if (!toolStyles.has(id)) {
+		toolStyles.set(id, new Promise((done) => {
+			const link = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `tools/${id}.css`, onload: done, onerror: done });
+			document.head.append(link);
+		}));
+	}
+	return toolStyles.get(id);
 }
 
 let unmount = null;
@@ -50,9 +56,12 @@ async function route() {
 	unmount = null;
 	document.title = tool ? `${tool.name} · 饰品铺子` : '饰品铺子';
 	if (!tool) return renderHome();
-	view.innerHTML = `<div class="page-head"><h1>${tool.name}</h1><a class="back" href="#/">${svg('<path d="M19 12H5M11 6l-6 6 6 6"/>')}饰品铺子</a></div><div id="tool"></div>`;
+	view.innerHTML = `<div class="page-head" data-tool="${id}"><h1>${tool.name}</h1><a class="back" href="#/" aria-label="饰品铺子" title="返回饰品铺子">${svg('<path d="M19 12H5M11 6l-6 6 6 6"/>')}<span>饰品铺子</span></a></div><div id="tool"></div>`;
+	const heading = view.querySelector('.page-head');
+	if (tool.useHeadingIcon) heading.querySelector('h1').style.setProperty('--page-ico', iconMask(tool.icon));
+	const target = document.getElementById('tool');
 	const [{ mount }] = await Promise.all([import(`./tools/${id}.js`), loadCss(id)]); // 进入时才加载
-	if (currentId() === id) unmount = mount(document.getElementById('tool'));
+	if (target.isConnected && currentId() === id) unmount = mount(target, heading);
 }
 
 addEventListener('hashchange', () => {

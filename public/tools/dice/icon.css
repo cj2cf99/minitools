@@ -1,0 +1,21 @@
+.dice-icon-spin {
+  transform-box: view-box;
+  transform-origin: center;
+  animation-duration: .64s;
+  animation-timing-function: cubic-bezier(.3,.7,.3,1);
+}
+
+.portal:is(:focus-visible, :active) .dice-icon-spin {
+  animation-name: dice-icon-spin;
+}
+
+@media (hover: hover) {
+  .portal:hover .dice-icon-spin { animation-name: dice-icon-spin; }
+}
+
+@keyframes dice-icon-spin {
+  0% { transform: rotate(0deg); }
+  16% { transform: rotate(-18deg) scale(.94); }
+  82% { transform: rotate(373deg) scale(1.04); }
+  100% { transform: rotate(360deg); }
+}
