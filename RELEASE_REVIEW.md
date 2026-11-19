@@ -220,3 +220,5 @@
 
 - myapp 02:48:55 发布，版本 bde3e92f-5770-4547-811e-46887d4e90f0，部署 2bafa998-7fb8-4aad-ade4-d2afd388b7b3。minitools 02:49:18 发布，版本 090faa16-d674-4650-8c17-52bce7ed2526，部署 543511be-93f5-4f0f-a6a8-70487f57ae04。两次均保留生产变量；控制面独立复查，各新版本承接 100% 流量。
 - 正式入口 https://myapp.cj2cf99.workers.dev/minitools/ ，塔罗页面 https://myapp.cj2cf99.workers.dev/minitools/tools/magiccard/ 。按本次决定优先提供抽牌及本地牌义，整局 AI 解读暂不可用。线上界面及交互待用户截图确认。花园和 Git 回执于下方补记。
+
+花园于 02:55:47 JST 登记成功，修订 88 → 89，项目 #19 新增「月下秘仪」#60、部署 #44、明细 #112，版本 0.0 → 1.0。生产加密快照 752009fcf926c1200863986cb4ccb30c3ed4d7c7 已独立推送并经远端克隆验证恢复。写入前 117/117 表与快照一致，写后 117/117 表与演练一致，完整性 ok、外键异常 0。小游戏发布源码 4a5812a61b31d7c93d3c00610d15616e2a51ceb4 已推送至 minitools/main，主站最终回执提交 54a573c1d8495e6e9cd321b0e58d3fb8121f46bf 与远端 main 一致。[主站执行回执](https://github.com/cj2cf99/cloudflaremyapp/blob/54a573c1d8495e6e9cd321b0e58d3fb8121f46bf/myapp/database/changes/minitools-magiccard-20261120/execution-receipt.json)。本补记随小游戏最终回执提交推送；线上交互待用户截图确认。
