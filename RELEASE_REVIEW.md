@@ -82,7 +82,7 @@
 
 ## 2026-11-19 JST 掷骰台发布候选
 
-2026-11-20 JST 用户确认本地验收通过。原三轮自测及最终两轮发布前自审均通过。用户完成 Wrangler 授权，并回复「ok，开始」确认下列花园清单及本次生产 minitools 部署。第三方独立审核未执行。[复核和用户原话](docs/reviews/DICE_ENTRY_REVIEW_2026-11-19.md)
+2026-11-20 JST 用户确认本地验收通过。原三轮自测及最终两轮发布前自审均通过。用户完成 Wrangler 授权，并回复「ok，开始」确认下列花园清单及本次生产 minitools 部署。生产发布和花园登记均已完成。第三方独立审核未执行。[复核和用户原话](docs/reviews/DICE_ENTRY_REVIEW_2026-11-19.md)
 
 ### 用户需求与验收标准
 
@@ -126,7 +126,7 @@
 - 同日，将「点数明细」移到设置右侧，骰台内控件改为跟随 2D／3D 的样式。Chrome 1440、390、320 像素实测位置、折叠互斥、键盘、结果、按钮固定宽度、双主题与返回重进通过。重新执行单测、语法检查、`git diff --check` 与 Wrangler 打包检查。
 - 用户确认本地验收后完成两轮发布前自审。第一轮对照 GitHub 固定来源、用户历次要求及发布差异，算法、网格及渲染算法核对通过，8,120 组组合、汇率接口 D1 替身、`npm.cmd test` 4/4、JavaScript 检查、Python 生成器语法和 `git diff --check` 通过。第二轮以标准样式本地 Worker 在 Chrome 1440、390、320 像素覆盖最终交互，复测首屏按需加载、慢速导入下快速退出重进、离开时观察器清理及汇率回归。Wrangler `deploy --dry-run` 打包 13 项静态资源通过。
 - 生产元数据预检首次因管理 API 未授权退出。用户在官方 OAuth 页面完成授权，Wrangler 回执成功。先在隔离 myapp 目录运行 `npm.cmd run db:sync-schema`，验证 217 个结构对象。随后重跑 `node node_modules/wrangler/bin/wrangler.js deployments list --name minitools --json`，确认活跃版本 `7df1c259-4cbb-4acb-b850-02dd5af79ae8` 承接 100% 流量，为本次拟回退点。部署前重核。
-- 线上效果待用户截图确认。实体手机、跨浏览器及 Blender 再生成未复测。浏览器已验证远端网格可用。发布和 Git 提交、推送均未执行。
+- 线上效果待用户截图确认。实体手机、跨浏览器及 Blender 再生成未复测。浏览器已验证远端网格可用。实际发布和 Git 结果见下方回执。
 
 ### 花园具体登记清单（用户已确认）
 
@@ -139,7 +139,7 @@
 | 发布失败时 | 无本次失败记录 | 新功能保持测试阶段及 0.0，在已部署的「工具总览」#50 新增一条待办改善「发布中 · 掷骰台」，记实际失败原因与时间。现有花园要求改善关联已部署功能，因此由工具总览承载失败说明 |
 | 其他 | 现有工具总览和汇率速算均为 1.0 | 既有功能与版本保留。项目、种子、Bug、数据源、关联均无更新，成功分支无改善新增 |
 
-根据真实发布结果执行一个分支，整体只登记一次。发布前已准备登记 SQL 模板 `.wrangler/minitools-dice-garden-20261120/approved-draft.sql`，实际版本、时间和数据库修订在结果明确后定稿。写入前重核项目、版本、修订和重复项，修订或旧值不匹配即停止。当前尚未写入生产花园。
+根据真实发布结果执行一个分支，整体只登记一次。发布前已准备登记 SQL 模板 `.wrangler/minitools-dice-garden-20261120/approved-draft.sql`，实际版本、时间和数据库修订在结果明确后定稿。写入前重核项目、版本、修订和重复项，修订或旧值不匹配即停止。实际写入结果见下方回执。
 
 ### 风险、恢复和独立审核重点
 
@@ -155,4 +155,7 @@
 ### 实际发布结果（2026-11-20 JST）
 
 - `npm.cmd run deploy -- --keep-vars` 成功，上传 8 个新增或改动的静态资源。生产 Worker `minitools` 版本 `b2c13dae-49a0-42d4-9b98-c641fe4879c8` 于 01:04:50 JST 接管 100% 流量。控制台部署记录 `fe86cb01-39c6-484b-96d3-2c233e44deec`，回退版本 `7df1c259-4cbb-4acb-b850-02dd5af79ae8`。
-- 线上效果待用户截图确认。Git 同步和花园后检回执待补记。
+- 花园已在生产 `stockanalysis` 一次登记成功，修订 `86 → 87`，饰品铺子 #19 新增「掷骰台」#59，部署 #42、明细 #110，功能版本 `0.0 → 1.0`。`quick_check` 为 `ok`，外键异常为零。Wrangler SQL 命令退出码为 0，包装脚本的 JSON 解析遇到表格格式。独立只读后检确认精确行和发布标识，SQL 执行一次。
+- 精确 SQL 先提交并推送至 `cloudflaremyapp/main`，提交 `b6b978319c87be18b70915d1c5ddcd84b08337a9`。生产加密备份 `production/20261119T160708Z_minitools-dice-garden-20261120`，提交 `1dbc7bd37093f64a49a1d54ec8d00d4a5e83a11d` 独立推送至 `refs/heads/db-snapshots/production`，全新远端克隆解密恢复 117/117 表通过。写前用新生产导出比对全部 117 表一致。[花园登记回执](https://github.com/cj2cf99/cloudflaremyapp/blob/f0da9cac3ee6b18882962bd9cb1cfe331866a201/myapp/database/changes/minitools-dice-garden-20261120/execution-receipt.json)
+- 已发布的代码提交 `cdb2afe0ad63628d65745e2742b0ea95d1821366` 已推送至 `minitools/main`；花园回执提交 `f0da9cac3ee6b18882962bd9cb1cfe331866a201` 已推送至 `cloudflaremyapp/main`，远端核对一致。本段发布回执另提交至 `minitools/main`。
+- 线上交互待用户截图确认，验收入口为 [主站掷骰台](https://myapp.cj2cf99.workers.dev/minitools/#/dice)。
