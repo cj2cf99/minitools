@@ -27,4 +27,15 @@ export const TOOLS = [
 		</g>
 		<path d="M2.5 10a10 10 0 0 1 3-5.5m16 9.5a10 10 0 0 1-3 5.5" stroke-width="1.5"/>`,
 	},
+	{
+		id: 'magiccard',
+		href: 'tools/magiccard/',
+		group: 'games',
+		name: '月下秘仪',
+		desc: '塔罗牌 · 与薇拉抽三张牌，听本局解读。',
+		icon: `<path class="tarot-icon-back" d="m7 18-3 .7a1.5 1.5 0 0 1-1.8-1.2L.9 6a1.5 1.5 0 0 1 1.2-1.7l8.2-1.6a1.5 1.5 0 0 1 1.7 1.2"/>
+			<g class="tarot-icon-front"><g transform="rotate(9 15 13)">
+				<rect x="9" y="5" width="12" height="16" rx="2"/><path d="m15 9 2.5 4-2.5 4-2.5-4z"/>
+			</g></g>`,
+	},
 ];

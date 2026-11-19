@@ -26,10 +26,26 @@ npm test
 
 ## 掷骰台
 
-饰品铺子的入口依次为「实用工具 → 汇率速算」和「小游戏 → 掷骰台」。掷骰台路径为 `/minitools/#/dice`。入口骰子图标在悬停或键盘聚焦时转一圈。
+掷骰台是「小游戏」的第一个入口。掷骰台路径为 `/minitools/#/dice`。入口骰子图标在悬停或键盘聚焦时转一圈。
 
 骰台内侧的固定按钮和总点数并排显示，外观随 2D／3D 模式切换。标题右侧的「设置」显示当前范围，展开可调整 3–30 的整数区间并切换模式。投掷后可展开设置右侧的「点数明细」查看每颗骰子的面值及加总。
 
 源码来自 [SampleProjects/randomCheck](https://github.com/cj2cf99/SampleProjects/tree/4284e62b6a44211771452f1dd3050cdf59e3918b/randomCheck)。项目已包含浏览器使用的 D4、D6、D8 网格。修改网格时可运行 `blender -b --factory-startup --python-exit-code 1 -P scripts/build_dice.py` 重新生成。
 
 在项目根目录运行 `npm.cmd run dev -- --local` 可隔离启动 Worker，再打开 `http://localhost:8799/#/dice`。掷骰台无需初始化数据。
+
+## 月下秘仪
+
+在「小游戏」中点掷骰台旁边的双牌图标，进入全屏占卜屋 `/minitools/tools/magiccard/`。菜单沿用主站外壳，游戏独占页面，左上角的「← 饰品铺子」返回菜单。旧书签 `/minitools/#/magiccard` 自动转到新地址。进入后才加载占卜屋，翻牌时才加载对应表演。78 张牌及正逆位释义来自本机 `SampleProjects` 提交 `078164c144ae86545efdbd912416abb442a113b8` 的 `magiccard/`。制作脚本和原画保存在该提交的 `magiccard/tools/`。
+
+在 `G:/selftool/minitools` 用两个终端运行以下命令。第一条启动隔离 Worker，第二条从 `G:/cloudflare/myapp` 加载实际主站外壳与代理。预览只绑定回环地址，使用本地鉴权替身，无需初始化业务数据。
+
+```powershell
+node node_modules/wrangler/bin/wrangler.js dev --local --ip 127.0.0.1 --port 8811 --persist-to .wrangler/tarot-acceptance/state --show-interactive-dev-session=false --var AI_BASE_URL:http://127.0.0.1:18786/v1 --var AI_MODEL:tarot-local
+```
+
+```powershell
+node scripts/preview-tarot.mjs
+```
+
+打开[饰品铺子菜单](http://127.0.0.1:8812/minitools/)或[全屏占卜屋](http://127.0.0.1:8812/minitools/tools/magiccard/)。本机模型沿用来源项目的 llama.cpp 配置，可用其 `start.ps1` 启动。生产 Worker 需要独立配置可达的兼容模型地址 `AI_BASE_URL` 和模型名 `AI_MODEL`，服务需要鉴权时使用 Secret `AI_API_KEY`。模型暂时不可用时可以回看单牌并在原牌阵重试。

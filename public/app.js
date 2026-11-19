@@ -28,7 +28,7 @@ function renderHome() {
 		<section class="tool-section" ${tone(g)}>
 			<h2>${g.label}</h2>
 			<div class="portals">${inGroup(g).map((t) => `
-				<a class="portal" href="#/${t.id}" aria-label="${t.name}" title="${t.name}：${t.desc}">
+				<a class="portal" href="${t.href ?? '#/' + t.id}" aria-label="${t.name}" title="${t.name}：${t.desc}">
 					<span class="portal-surface" aria-hidden="true"></span>
 					<b class="tool-icon">${svg(t.icon)}</b>
 					<span class="portal-label">${t.name}</span>
@@ -54,6 +54,7 @@ async function route() {
 	const tool = TOOLS.find((t) => t.id === id);
 	unmount?.();
 	unmount = null;
+	if (tool?.href) return location.replace(tool.href); // 兼容旧的游戏哈希书签
 	document.title = tool ? `${tool.name} · 饰品铺子` : '饰品铺子';
 	if (!tool) return renderHome();
 	view.innerHTML = `<div class="page-head" data-tool="${id}"><h1>${tool.name}</h1><a class="back" href="#/" aria-label="饰品铺子" title="返回饰品铺子">${svg('<path d="M19 12H5M11 6l-6 6 6 6"/>')}<span>饰品铺子</span></a></div><div id="tool"></div>`;
@@ -65,7 +66,7 @@ async function route() {
 }
 
 addEventListener('hashchange', () => {
-	if (!document.startViewTransition) return route();
+	if (!document.startViewTransition || TOOLS.some(t => t.href && t.id === currentId())) return route();
 	document.startViewTransition(route).ready.catch(() => {}); // 页面隐藏时过渡会被中止，内容照常更新
 });
 route();

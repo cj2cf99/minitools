@@ -1,0 +1,29 @@
+.tool-icon svg:has(.tarot-icon-front) { overflow: visible; }
+
+.tarot-icon-back, .tarot-icon-front {
+  transform-box: view-box;
+  transform-origin: 50% 80%;
+  animation-duration: .76s;
+  animation-timing-function: ease-in-out;
+}
+
+.portal:is(:focus-visible, :active) .tarot-icon-back { animation-name: tarot-fan-back; }
+.portal:is(:focus-visible, :active) .tarot-icon-front { animation-name: tarot-fan-front; }
+@media (hover: hover) {
+  .portal:hover .tarot-icon-back { animation-name: tarot-fan-back; }
+  .portal:hover .tarot-icon-front { animation-name: tarot-fan-front; }
+}
+
+@keyframes tarot-fan-back {
+  0%, 100% { transform: rotate(0); }
+  16% { transform: rotate(8deg); }
+  48% { transform: rotate(-20deg); }
+  82% { transform: rotate(4deg); }
+}
+
+@keyframes tarot-fan-front {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  16% { transform: translateY(1px) rotate(-8deg); }
+  52% { transform: translateY(-2px) rotate(22deg); }
+  84% { transform: translateY(0) rotate(-4deg); }
+}

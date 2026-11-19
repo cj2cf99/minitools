@@ -1,9 +1,13 @@
+import { readTarot } from './tarot-reading.js';
+
 // 汇率读个股监察写入主站 D1 的 current_market_indicators，本 Worker 只读。
 const SQL = "SELECT metric, value, daily_change_pct, source_as_of FROM current_market_indicators WHERE metric IN ('fx_jpy', 'fx_cny')";
 
 export default {
 	async fetch(request, env) {
-		if (new URL(request.url).pathname !== '/api/fx') return new Response('Not Found', { status: 404 });
+		const path = new URL(request.url).pathname;
+		if (path === '/api/reading') return readTarot(request, env);
+		if (path !== '/api/fx') return new Response('Not Found', { status: 404 });
 		const headers = { 'Cache-Control': 'no-store' };
 		try {
 			const { results } = await env.DB.prepare(SQL).all();

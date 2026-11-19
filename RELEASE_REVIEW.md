@@ -159,3 +159,64 @@
 - 精确 SQL 先提交并推送至 `cloudflaremyapp/main`，提交 `b6b978319c87be18b70915d1c5ddcd84b08337a9`。生产加密备份 `production/20261119T160708Z_minitools-dice-garden-20261120`，提交 `1dbc7bd37093f64a49a1d54ec8d00d4a5e83a11d` 独立推送至 `refs/heads/db-snapshots/production`，全新远端克隆解密恢复 117/117 表通过。写前用新生产导出比对全部 117 表一致。[花园登记回执](https://github.com/cj2cf99/cloudflaremyapp/blob/f0da9cac3ee6b18882962bd9cb1cfe331866a201/myapp/database/changes/minitools-dice-garden-20261120/execution-receipt.json)
 - 已发布的代码提交 `cdb2afe0ad63628d65745e2742b0ea95d1821366` 已推送至 `minitools/main`；花园回执提交 `f0da9cac3ee6b18882962bd9cb1cfe331866a201` 已推送至 `cloudflaremyapp/main`，远端核对一致。本段发布回执另提交至 `minitools/main`。
 - 线上交互待用户截图确认，验收入口为 [主站掷骰台](https://myapp.cj2cf99.workers.dev/minitools/#/dice)。
+
+## 2026-11-20 JST · 月下秘仪迁入与部署准备
+
+### 需求、基线和范围
+
+用户要求接过 SampleProjects 的 magiccard 塔罗游戏，确认使用本机交接提交，并要求放在掷骰台旁边、使用两张简化塔罗牌图标、加入主站基础页面与样式。验收顺序为两轮带合规检查的自测，再提供本地服务。原始游戏需求、详细设计和动作复核均在来源仓库的 magiccard/{REQUIREMENTS.md,docs/DESIGN.md,docs/reviews/}。
+
+- 来源仓库 G:/samplePj，提交 078164c144ae86545efdbd912416abb442a113b8。核对时 GitHub main 为 4284e62b6a44211771452f1dd3050cdf59e3918b，仅含 randomCheck。已取得用户对本机来源的明确确认。
+- 本项目 G:/selftool/minitools，目标 Cloudflare 生产 Worker minitools，基线 03a28bc9942cd63198131dcde0c73d6b63a97b45。主站 G:/cloudflare/myapp，目标 Worker myapp，基线 fd9678c22e1886d3f8e6e00e666f6e774b97dd29。分别用 git diff 对照基线，用 git ls-files --others --exclude-standard 补查新增文件。主站也已追加根目录审核记录。
+- 对照全局框架偏好 G:/selftool/resourceforlater/docs/FRAMEWORK_PREFERENCES.md、项目备忘录 C:/Users/asura/.claude/projects/G--selftool-minitools/memory/standalone-page-uses-main-shell.md、主站 docs/design/development.md 和 docs/design/ui-redesign/MOTION_STANDARD.md。沿用现有分组和真实外壳，工具、场景及牌面分阶段加载。来源设计注明未找到单独项目备忘录。游戏场景用同源 iframe 保留原作视口构图和独立样式，外层为真实主站主题、页头、工具标题和返回入口。
+
+### 实现和实际差异
+
+| 范围 | 之前 | 此次变更 |
+| --- | --- | --- |
+| public/tools/index.js、magiccard.js、magiccard.css | 小游戏只有掷骰台 | 下一个入口为月下秘仪，双牌图标，路由 /minitools/#/magiccard；退出时释放场景 |
+| public/tools/magiccard/ | 无占卜屋 | 原版完整 78 张、三款牌背、房间互动、抽三翻三、牌义和表演。225 个素材共 41,495,777 字节逐文件与来源比对一致。原样保留场景 CSS 和星空脚本。牌库改为前后端共用的模块，游戏读取相对路径 API，控件待事件绑定后开放 |
+| worker.js、tarot-reading.js、test/tarot.test.js | 仅汇率 API | 新增 POST /api/reading，沿用原牌义、主题、提示词、输出校验、格式回退、超时和原牌阵重试。服务端校验来源、2 KiB 请求上限、三个不同有效牌位。只发送选题与相应本地牌义 |
+| scripts/preview-tarot.mjs、README.md | 直连子 Worker 缺少公共页头与样式 | 可复现的本机回环预览调用主站实际 shell()、代理、导航 JS 及公共 CSS；本地验收使用隔离鉴权替身 |
+| 主站 src/features/minitools/routes.mjs、tests/minitools-host.test.mjs | 代理仅允许读请求 | 经过原鉴权后仅允许解读路径同源 POST，选择性转发来源、JSON 类型、正文；媒体请求可转发 Range。其它路径的方法约束延续 |
+
+### 两轮自测与合规检查
+
+1. 桌面 1440×900／雅致主题。在隔离 Chrome 通过实际主站外壳进入游戏，验证入口相邻、首页未拉取场景、换牌背、点击屋内物件、敲铃、选题、从牌扇露出区域抽三张、逐张翻牌与按需请求 MP4、查看本地释义。初测发现 workerd 拒绝 redirect:error，改用 manual 并通过状态码拒绝上游跳转。为避免初始化时提前交互，绑定完成后再解除 inert。修正后真实 llama.cpp 回答、重新开局、返回释放场景及掷骰入口通过。检查对照原玩法、独立子项目边界、请求校验、密钥仅服务端使用和无牌局历史。
+2. 手机 390×844／赛博主题及系统减少动态偏好。实际切换主站主题、触屏更换牌背，完成选题、抽牌、翻牌。拦截第一次解读模拟 503，核对三张已翻牌保留，点击重试经实际 Worker 与本机模型返回 200，正文可读，重开与返回通过。两轮外层和内层文档横向溢出均为 0，无页面脚本异常。检查主站基础页、双牌图标、按需加载、兼容性、隔离数据及 Access 验收范围。浏览器脚本在 .wrangler/tarot-acceptance 下运行。
+- npm.cmd test 通过 7/7（含全 78 张资产、接口拒绝和模型格式降级）。node node_modules/wrangler/bin/wrangler.js deploy --dry-run --outdir .wrangler/tarot-acceptance/build 通过，254 项静态文件。主站 npm.cmd test 通过 835/835；npm.cmd run check 打包通过。两个项目的 git diff --check 已检查。
+- 通过脚本逐项比对 225 个素材与固定来源工作树字节，并比对 styles.css、salon.css、sky.js。浏览器请求实测本地 MP4 可取；开发静态服务对测试的 Range 返回 200 全文件，生产 CDN 的 206 行为未实测。
+- 本地启动命令及初始化见本仓库 README.md「月下秘仪」，工作目录 G:/selftool/minitools。当前隔离 Worker 端口 8811，主站外壳预览 http://127.0.0.1:8812/minitools/#/magiccard。本地模型服务为 127.0.0.1:18786。无业务数据库初始化。本地验收由用户进行，尚未确认。
+
+### 配置、数据、登记与发布
+
+- 业务数据库迁移、回填、持久化和依赖新增均无。线上 minitools 必须配置可由 Worker 访问的兼容模型服务 AI_BASE_URL 与 AI_MODEL，按需设置 AI_API_KEY Secret。本机回环地址仅供本地验收。生产模型提供方、模型配置与连通性待确认。
+- 花园已确认意愿及具体清单。生产只读结构同步通过，修订 88，饰品铺子 #19 的工具总览 #50、汇率速算 #51、掷骰台 #59 各为 1.0。两 Worker 成功后新增页面功能「月下秘仪」，合计一条部署及一条明细，0.0 → 1.0，记录两个真实版本。种子和功能改善无新增。发布失败仅记「发布中」和实际情况。主站 database/changes/minitools-magiccard-20261120/ 保存清单和成功 SQL 模板，已在同步结构的内存库用合成数据演练，验证外键和重复执行拒绝。生产花园未写入。
+- 计划先核对两仓最终差异、生产版本与待配置的模型，再取得本次具体部署许可。先后发布主站接线和 minitools 游戏，以免给用户呈现无解读代理的入口。两处均使用各仓已验证配置并保留其它生产变量。分别读取实际接管流量的版本与时间。业务数据库部署步骤无。
+- 发布结果明确后，重新核对花园旧值和有效生产备份，备份须已独立提交推送并验证远端恢复。根据真实结果生成精确 SQL，先提交再一次登记并后检。补记两个实际版本、时间、截图验收状态及两仓 Git 提交、推送和远端一致性。
+- 风险集中在主站的方法限制、模型服务可达性和游戏大资源。审核重点为 Post 路径和来源、跨工具隔离、双主题、模型失败保留牌阵。若发布中途失败，报告实际到达版本，按当时核对的健康版本逆序回退已发布 Worker，单独核对花园状态。无业务数据恢复动作。
+- 两轮自测完成。生产部署许可、第三方审核、生产模型验收和实体手机验证均待完成。Access 受控线上交互待用户截图确认。生产部署、Git 提交及推送均未执行。
+
+### 入口图标动效补正（2026-11-20 JST）
+
+用户指出双牌图标缺少动画。public/tools/index.js 给前后两张牌分别标记，public/index.html 在首页载入独立的 public/tools/magiccard/icon.css。悬停、键盘聚焦或按下入口时，两张牌先靠拢，再反向展开并回到原位，一轮 760 毫秒。静态图形和游戏场景继续复用原资源。
+
+在带主站外壳的本地首页用独立 Chrome 核对了静止状态、悬停时两牌中段实际反向旋转、结束复位、Tab 聚焦重新触发和 Enter 进入游戏；首页仅加载图标样式，未请求游戏脚本或素材。npm.cmd test 通过 7/7，子项目 Wrangler dry-run 读取 255 个静态文件并通过。此补正仅涉及子项目入口展示，生产发布待确认。
+
+### 用户修订 · 占卜屋独立全屏页面（2026-11-20 JST）
+
+用户要求“塔罗牌游戏走全屏页面，不使用标准页面，不加表头，但是主页需要一个返回按钮，返回目标是饰品铺子菜单”。本条取代本次记录前文关于在标准工具页内嵌占卜屋的设计。饰品铺子菜单继续使用主站基础页，游戏以浏览器可视区域为画布。
+
+- public/tools/index.js 和 public/app.js 让菜单双牌链接直接进入 /minitools/tools/magiccard/。旧 /minitools/#/magiccard 书签兼容跳转。新页面和菜单支持同源页面过渡；删除原先用于创建 iframe 与限定高度的 magiccard.js、magiccard.css。
+- public/tools/magiccard/index.html、styles.css、salon.css 移除原游戏品牌表头，返回、重来、换牌背作为场景内控件显示。左上角「← 饰品铺子」直接回到菜单，允许从直接访问和进行中的牌局退出。public/tools/magiccard/icon.css 更新样式选择器，使双牌图标动效适配新链接。README.md 更新入口和预览说明。
+- 本地入口为 http://127.0.0.1:8812/minitools/tools/magiccard/ ，返回 http://127.0.0.1:8812/minitools/ 。主站既有代理只给菜单首页注入公共外壳，主站代码、鉴权、模型及数据库配置此次修订均无额外变化。花园仍是先前确认的同一项游戏功能。
+- 验证结果：桌面 1440×900、手机 390×844 经本地 Worker 及主站代理完成菜单进入、首页返回、旧书签跳转、刷新、抽牌翻牌、真实模型解读和回到菜单后打开骰台。手机还覆盖 503 后原牌阵重试。修正导航过渡初始声明后手机复验通过。320×640 验证首页和抽牌阶段左右控件可点且不重叠。两轮页面均无横向溢出。npm.cmd test 7/7，Wrangler dry-run 读取 253 个静态文件通过，git diff --check 通过。界面已在本地打开，生产部署待用户确认。
+
+### 生产部署授权与最终范围（2026-11-20 JST）
+
+用户已指示开始部署，并在核对生产 minitools 只有 ASSETS 和 DB 后明确选择「先上线抽牌和本地牌义，接受整局 AI 解读暂不可用」。本次按这个范围发布主站 myapp 的路由接线与 minitools 的全屏游戏。生产环境不配置模型、不产生模型调用费用；合法牌阵请求在缺少模型配置时返回 503，牌阵保留，可继续查看本地牌义。用户保留后续启用模型的决定权。生产上线前基线为 myapp abddfa15-676d-478b-9423-fd0f4c6e8d7e 和 minitools b2c13dae-49a0-42d4-9b98-c641fe4879c8，均为 100% 流量。两仓远端 HEAD 与审核基线一致；复核结构同步通过，花园修订 88，塔罗功能及重复登记均为 0。花园登记沿用已确认的记录清单，备注须写明此次 AI 能力状态。线上交互待用户截图确认。
+
+### 实际发布（2026-11-20 JST）
+
+- myapp 02:48:55 发布，版本 bde3e92f-5770-4547-811e-46887d4e90f0，部署 2bafa998-7fb8-4aad-ade4-d2afd388b7b3。minitools 02:49:18 发布，版本 090faa16-d674-4650-8c17-52bce7ed2526，部署 543511be-93f5-4f0f-a6a8-70487f57ae04。两次均保留生产变量；控制面独立复查，各新版本承接 100% 流量。
+- 正式入口 https://myapp.cj2cf99.workers.dev/minitools/ ，塔罗页面 https://myapp.cj2cf99.workers.dev/minitools/tools/magiccard/ 。按本次决定优先提供抽牌及本地牌义，整局 AI 解读暂不可用。线上界面及交互待用户截图确认。花园和 Git 回执于下方补记。

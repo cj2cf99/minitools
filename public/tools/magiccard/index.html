@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a101d">
+  <meta name="description" content="在星盘下抽取三张塔罗牌，依次揭开来处、当下与下一步。">
+  <title>月下秘仪 · Nocturne Tarot</title>
+  <style>@view-transition { navigation: auto; }</style>
+  <link rel="icon" href="assets/sigil.png" type="image/png">
+  <link rel="preload" as="image" href="assets/salon/ovalroom.webp" media="(min-width:721px)">
+  <link rel="preload" as="image" href="assets/salon/pocketroom.webp" media="(max-width:720px)">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="salon.css">
+  <script defer src="sky.js"></script>
+  <script type="module" src="game.js"></script>
+</head>
+<body data-back="astral" data-phase="foyer" inert aria-busy="true">
+  <div class="salon-scene" aria-hidden="true">
+    <div class="lamplight"></div>
+    <img class="foyer-chair" src="assets/salon/windowchair.webp" alt="">
+    <div class="window-witch">
+      <picture><source media="(prefers-reduced-motion: reduce)" srcset="assets/salon/lamp.webp"><img class="polishing" src="assets/salon/polish.webp" alt=""></picture>
+      <img class="sorting" src="assets/salon/sort.webp" alt=""><img class="studying" src="assets/salon/study.webp" alt=""><img class="turning" src="assets/salon/turn.webp" alt="">
+      <div class="walking" id="window-stride"></div><img class="backing" id="window-back" alt="">
+      <img class="stargazing" id="window-globe" alt="">
+    </div>
+    <div class="meeting"><div class="host" id="host"></div><img class="kept-flower" src="assets/salon/lavender.webp" alt=""></div>
+    <div class="overhead-view"></div>
+  </div>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <a class="room-return outline-button" href="../../" aria-label="返回饰品铺子菜单"><span aria-hidden="true">←</span> 饰品铺子</a>
+  <div class="room-actions">
+    <button id="restart" class="quiet-button" type="button" hidden>重来</button>
+    <button id="back-picker" class="outline-button" type="button" aria-haspopup="dialog">
+      <span class="deck-icon" aria-hidden="true"></span><span>更换牌背</span>
+    </button>
+  </div>
+
+  <main>
+    <div class="room-objects" id="room-objects" role="group" aria-label="探索占卜屋">
+      <button type="button" class="room-object" data-object="lantern" aria-label="看看铜灯"><span>铜灯</span></button>
+      <button type="button" class="room-object" data-object="lavender" aria-label="看看窗边的薰衣草"><img src="assets/salon/lavender.webp" alt=""><span>薰衣草</span></button>
+      <button type="button" class="room-object" data-object="window" aria-label="看看月窗"><span>月窗</span></button>
+      <button type="button" class="room-object" data-object="globe" aria-label="看看星仪"><span>星仪</span></button>
+    </div>
+    <div class="witch-visit" id="witch-visit">
+      <div class="witch-figure">
+        <button type="button" id="greet-witch" aria-label="和窗边的薇拉聊聊" aria-controls="witch-dialogue" aria-expanded="false"><span class="greet-cue" aria-hidden="true">聊聊</span></button>
+        <div class="witch-dialogue" id="witch-dialogue" hidden>
+          <p id="witch-line" role="status" aria-live="polite"></p>
+          <button id="witch-reply" type="button"></button>
+        </div>
+      </div>
+    </div>
+    <div class="hero" id="hero">
+      <p class="eyebrow"><span></span><b aria-hidden="true">✦</b><span id="eyebrow">NOCTURNE TAROT</span><b aria-hidden="true">✦</b><span></span></p>
+      <h1 id="phase-title" tabindex="-1">月下占卜屋</h1>
+      <p class="hero-copy" id="phase-copy">窗边透着灯火。桌边，留着一把空椅。</p>
+    </div>
+
+    <div class="desk-content" id="desk-content">
+    <div id="questions" class="questions" role="group" aria-label="选择本局问题" hidden></div>
+    <section class="reading" id="reading" aria-labelledby="reading-title" hidden>
+      <h2 id="reading-title" class="sr-only" tabindex="-1">解读结果</h2>
+      <p class="reading-story" id="reading-story" role="status"></p>
+      <div class="reading-actions">
+        <button id="read-again" class="quiet-button" type="button">再抽一次</button>
+        <button id="retry-reading" class="outline-button" type="button" hidden>请她再试一次</button>
+      </div>
+    </section>
+
+    <section class="table" aria-label="塔罗牌桌">
+      <div class="table-glow" aria-hidden="true"></div>
+      <div class="fan" id="fan" aria-label="待选牌扇"></div>
+      <div class="spread" id="spread" aria-label="三张牌阵" hidden></div>
+      <div class="sigil-line" aria-hidden="true"><span></span><b>✧</b><span></span></div>
+    </section>
+
+    <section class="meaning" id="meaning" aria-labelledby="meaning-title" hidden>
+      <div class="meaning-meta">
+        <span id="meaning-position" class="small-label"></span>
+        <h2 id="meaning-title"></h2>
+        <p id="meaning-en"></p>
+      </div>
+      <div class="meaning-body">
+        <ul id="meaning-tags" class="tags" aria-label="牌义关键词"></ul>
+        <p id="meaning-copy"></p>
+      </div>
+    </section>
+
+    <div class="controls" id="controls">
+      <button id="bell" type="button"><img src="assets/salon/bell.webp" width="93" height="75" alt=""><span>轻叩桌铃 · 入座</span></button>
+      <button class="gold-button" id="primary" type="button" hidden><span aria-hidden="true">✧</span><span id="primary-label">翻牌</span></button>
+      <div class="draw-counter" id="draw-counter" hidden><span class="draw-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="count-label"></span></div>
+      <ol class="steps" aria-label="游戏进度">
+        <li aria-current="step"><span aria-hidden="true"></span>选题</li>
+        <li><span aria-hidden="true"></span>抽牌</li>
+        <li><span aria-hidden="true"></span>翻牌</li>
+        <li><span aria-hidden="true"></span>解读</li>
+      </ol>
+    </div>
+    <p class="sr-only" id="announcement" role="status" aria-atomic="true"></p>
+    </div>
+  </main>
+
+  <footer><span aria-hidden="true">✦</span><span>22 张大阿卡那 · 56 张小阿卡那</span><span aria-hidden="true">✦</span></footer>
+
+  <dialog id="backs-dialog" class="popup" aria-labelledby="backs-title">
+    <div class="popup-top">
+      <h2 id="backs-title">选择牌背</h2>
+      <form method="dialog"><button class="close-button" aria-label="关闭牌背选择">×</button></form>
+    </div>
+    <div class="back-options" id="back-options" aria-label="牌背样式"></div>
+  </dialog>
+
+</body>
+</html>
