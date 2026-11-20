@@ -49,3 +49,11 @@ node scripts/preview-tarot.mjs
 ```
 
 打开[饰品铺子菜单](http://127.0.0.1:8812/minitools/)或[全屏占卜屋](http://127.0.0.1:8812/minitools/tools/magiccard/)。本机预览使用来源项目的 llama.cpp，可用其 `start.ps1` 启动。第一阶段正式页面请求主站同源 `POST /api/tarot/reading`。主站负责 Access、牌阵校验和塔罗提示词，通过本地精灵的共享 Workers AI 客户端生成回答。模型暂时不可用时可以回看单牌并在原牌阵重试。接口来源为 SampleProjects 提交 `f00114f`。
+
+## 告解骰
+
+在「小游戏」中点烛台与骰子的图标，进入全屏页 `/minitools/tools/sindie/`。一颗 D14 七罪骰（七大罪各两面），点「掷」时先由内核定出结果，抛掷、弹跳、翻滚、晃动都收束到这个结果面，落定后才揭示拉丁罪名。连续三次不会相同：若会三连，则从其余 6 面重抽。页面只在内存里记最近两次结果。
+
+- 内核 `public/tools/sindie/core.js` 原样复制到 subscriptions-api（`G:/selftool/informationManage/api-worker/src/sin-die-core.js`），供 `GET /api/v1/sin-die` 每个东京整点出一次结果，缓存在 KV `kvforapi` 的 `sindie:hour:v1`。
+- 需求与设计：`docs/sindie/`；审核：`docs/reviews/SINDIE_*`。
+- 本页纯静态，可用 `.claude/launch.json` 的 `static` 配置预览（`python -m http.server 8798 --bind 127.0.0.1 --directory public`），不连任何线上数据。

@@ -1,0 +1,127 @@
+/* 告解骰：氛围层全为 CSS；--u（世界单位像素）和 --cy（骰子落点高度）由 game.js 写入 */
+:root { --u: 60px; --cy: 46%; --sin: .766; }
+
+body {
+  --bg0: #0b0907; --bg1: #2a1d12; --stone: #3a2c20; --stone-hi: #6b5238;
+  --ray: 255 222 160; --ray-a: .26; --gild: #e8c27a; --ink: #f4e6c8; --dim: #b39a74;
+  --rose-a: .18; --rose: conic-gradient(from 0deg, #6b4a26, #2a1c10, #8a6230, #2a1c10, #6b4a26, #2a1c10, #8a6230, #2a1c10, #6b4a26);
+  --die-lit: #efe3c6; --die-shade: #4a3826; --die-edge: #d7a94f; --die-ink: #5a3a18; --candles: 1; --grain: .2;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body {
+  background: radial-gradient(120% 90% at 50% 15%, var(--bg1), var(--bg0) 70%);
+  color: var(--ink);
+  font-family: "Cinzel", "Trajan Pro", "Palatino Linotype", "Book Antiqua", "Songti SC", "SimSun", serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sanctum, #stage { position: fixed; inset: 0; }
+#stage { width: 100%; height: 100%; touch-action: manipulation; }
+
+/* 玫瑰窗：放射彩块 + 石棂遮罩，缓慢自转 */
+.rose {
+  position: absolute; left: 50%; top: -7vmin; width: 46vmin; aspect-ratio: 1; translate: -50% 0;
+  border-radius: 50%; background: var(--rose); opacity: var(--rose-a);
+  -webkit-mask: radial-gradient(circle, #000 9%, transparent 10% 13%, #000 14% 38%, transparent 39% 41%, #000 42% 66%, transparent 67%),
+                repeating-conic-gradient(#000 0 13deg, transparent 13deg 15deg);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  filter: blur(1.2px) brightness(.85); animation: rose 140s linear infinite; transition: opacity 1s;
+}
+@keyframes rose { to { rotate: 360deg; } }
+
+/* 自上而下的光柱 */
+.beam {
+  position: absolute; left: 50%; top: 0; width: calc(var(--u) * 7); height: calc(var(--cy) + var(--u) * 1.6); translate: -50% 0;
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+  background: linear-gradient(rgb(var(--ray) / calc(var(--ray-a) * 1.3)), rgb(var(--ray) / var(--ray-a)) 60%, transparent);
+  -webkit-mask: linear-gradient(90deg, transparent, #000 30% 70%, transparent);
+  filter: blur(6px); mix-blend-mode: screen; animation: breathe 7s ease-in-out infinite;
+  transition: opacity .8s, filter .8s;
+}
+@keyframes breathe { 50% { opacity: .72; } }
+body[data-phase="reveal"] .beam { filter: blur(4px) brightness(1.7); animation-duration: 3s; }
+
+/* 祭坛：石面椭圆 + 铭文环（透视压扁） */
+.altar {
+  position: absolute; left: 50%; top: var(--cy); width: calc(var(--u) * 6.8); aspect-ratio: 1;
+  translate: -50% -50%; scale: 1 var(--sin);
+}
+.altar::before {
+  content: ""; position: absolute; inset: -8%; border-radius: 50%;
+  background: radial-gradient(circle, var(--stone-hi) 0, var(--stone) 45%, transparent 71%);
+  opacity: .55; filter: blur(2px);
+}
+.inscription { position: absolute; inset: 0; animation: rose 220s linear infinite reverse; overflow: visible; transition: opacity .8s; }
+body[data-phase="reveal"] .inscription { opacity: .3; }
+.inscription text { font-size: 9.4px; letter-spacing: 1.6px; fill: var(--gild); opacity: .6; }
+.ring-line { fill: none; stroke: var(--gild); stroke-width: .5; opacity: .35; }
+.halo { position: absolute; inset: 30%; border-radius: 50%; border: 2px solid var(--gild); opacity: 0; }
+body[data-phase="reveal"] .halo { animation: halo 1.6s cubic-bezier(.2,.7,.2,1) forwards; }
+@keyframes halo { 0% { opacity: .9; scale: .3; } 100% { opacity: 0; scale: 1.7; } }
+
+/* 烛火 */
+.candle { position: absolute; bottom: 12vh; width: 2.6vmin; height: 20vmin; opacity: var(--candles);
+  background: linear-gradient(90deg, #8e7a5c, #efe2c4 40%, #b9a27c); border-radius: 3px 3px 1px 1px; transition: opacity 1s; }
+.candle.left { left: max(4vw, 14px); height: 26vmin; }
+.candle.right { right: max(5vw, 18px); }
+.candle::after { content: ""; position: absolute; left: 50%; top: -1.6vmin; width: 18vmin; aspect-ratio: 1; translate: -50% -50%;
+  background: radial-gradient(circle, rgb(255 190 110 / .35), transparent 60%); mix-blend-mode: screen; animation: glow 3.1s ease-in-out infinite; }
+.candle i { position: absolute; left: 50%; top: -4vmin; width: 1.8vmin; height: 4vmin; translate: -50% 0; transform-origin: 50% 100%;
+  border-radius: 50% 50% 45% 45% / 70% 70% 30% 30%; background: radial-gradient(60% 50% at 50% 70%, #fff8dc, #ffc25a 45%, #ff7a1a 75%, transparent);
+  filter: blur(.4px); animation: flicker 1.7s ease-in-out infinite; }
+.candle.right i { animation-delay: -.8s; }
+@keyframes flicker { 0%,100% { rotate: -2deg; scale: 1 1; } 30% { rotate: 3deg; scale: .92 1.08; } 60% { rotate: -1deg; scale: 1.05 .94; } }
+@keyframes glow { 50% { opacity: .65; } }
+
+/* 风化颗粒 + 暗角 */
+.grain { position: absolute; inset: 0; opacity: var(--grain); mix-blend-mode: overlay; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgb(0 0 0 / .85)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+/* 控件 */
+.room-return {
+  font: 600 13px/1 system-ui, sans-serif; color: var(--ink); text-decoration: none; letter-spacing: .04em;
+  border: 1px solid color-mix(in srgb, var(--gild) 55%, transparent); background: rgb(0 0 0 / .32);
+  backdrop-filter: blur(6px); border-radius: 999px; padding: 8px 13px; cursor: pointer; transition: background .2s, border-color .2s, scale .2s;
+}
+.room-return { position: fixed; left: 14px; top: 14px; z-index: 3; }
+.room-return:hover { background: rgb(0 0 0 / .5); border-color: var(--gild); }
+
+.cast {
+  position: fixed; left: 50%; bottom: max(26px, 5vh); z-index: 3; translate: -50% 0;
+  width: 78px; aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 0; padding: 0;
+  background: radial-gradient(circle at 38% 32%, #f6dc9a, var(--gild) 38%, #7a5420 100%);
+  box-shadow: 0 0 0 3px rgb(0 0 0 / .35), 0 0 0 5px color-mix(in srgb, var(--gild) 60%, transparent), 0 10px 30px rgb(0 0 0 / .6), 0 0 40px rgb(var(--ray) / .35);
+  font: 700 30px/1 "Songti SC", "SimSun", serif; color: #2b1a08; text-shadow: 0 1px 0 rgb(255 240 200 / .6);
+  transition: scale .25s cubic-bezier(.3,1.6,.5,1), filter .3s, opacity .3s;
+}
+.cast::before { content: ""; position: absolute; inset: -12px; border-radius: 50%; border: 1px solid var(--gild); opacity: .5; animation: summon 2.6s ease-out infinite; }
+@keyframes summon { from { scale: .85; opacity: .7; } to { scale: 1.35; opacity: 0; } }
+.cast:hover { scale: 1.07; }
+.cast:active { scale: .92; }
+.cast:disabled { cursor: default; filter: grayscale(.6) brightness(.6); scale: .9; }
+.cast:disabled::before { animation: none; opacity: 0; }
+
+/* 揭示牌匾：逐字刻出 */
+.plaque {
+  position: fixed; left: 50%; bottom: calc(max(26px, 5vh) + 112px); z-index: 2; translate: -50% 0;
+  display: grid; justify-items: center; gap: 2px; text-align: center; pointer-events: none; width: min(92vw, 520px);
+}
+.plaque > * { margin: 0; opacity: 0; }
+body[data-phase="reveal"] .plaque > * { animation: rise .7s cubic-bezier(.2,.8,.2,1) forwards; }
+.emblem { width: 34px; height: 34px; fill: none; stroke: var(--gild); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px rgb(var(--ray) / .8)); }
+.numeral { font-size: 13px; letter-spacing: .5em; color: var(--gild); animation-delay: .15s !important; }
+.latin { font-size: clamp(30px, 7vmin, 52px); font-weight: 600; letter-spacing: .22em; color: var(--ink); line-height: 1.1; opacity: 1 !important; animation: none !important;
+  text-shadow: 0 0 18px rgb(var(--ray) / .55), 0 2px 0 rgb(0 0 0 / .5); }
+.latin span { display: inline-block; opacity: 0; }
+body[data-phase="reveal"] .latin span { animation: carve .5s cubic-bezier(.2,.8,.2,1) forwards; animation-delay: calc(.3s + var(--i) * 85ms); }
+.zh { font-size: 15px; letter-spacing: .6em; padding-left: .6em; color: var(--dim); animation-delay: .95s !important; }
+@keyframes rise { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes carve { 0% { opacity: 0; scale: 1.6; filter: blur(6px); } 60% { opacity: 1; filter: blur(0); } 100% { opacity: 1; scale: 1; } }
+
+@media (max-width: 560px) {
+    .candle { bottom: 18vh; }
+}

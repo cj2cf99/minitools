@@ -38,4 +38,17 @@ export const TOOLS = [
 				<rect x="9" y="5" width="12" height="16" rx="2"/><path d="m15 9 2.5 4-2.5 4-2.5-4z"/>
 			</g></g>`,
 	},
+	{
+		id: 'sindie',
+		href: 'tools/sindie/',
+		group: 'games',
+		name: '告解骰',
+		desc: '七罪骰 · 在烛光祭坛上掷出一罪。',
+		icon: `<path d="M4 22V11h4v11M2 22h21"/>
+			<g class="sindie-icon-flame"><path d="M6 9c-1.3-1-1.3-3 0-5 1.3 2 1.3 4 0 5z"/></g>
+			<g class="sindie-icon-dust"><path d="M10 21l-1.6-1.2M24 21l1.6-1.2" stroke-width="1.5"/></g>
+			<g class="sindie-icon-air"><g class="sindie-icon-spin"><g class="sindie-icon-rock"><g class="sindie-icon-squash">
+				<path d="M13 22h8l2-5-6-5-6 5z"/><path d="M11 17l6 2 6-2M17 12v7M17 19l-4 3m4-3 4 3"/>
+			</g></g></g></g>`,
+	},
 ];

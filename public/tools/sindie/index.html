@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b0907">
+  <meta name="description" content="在古老祭坛上掷出一颗七罪骰。">
+  <title>告解骰 · Alea Peccatorum</title>
+  <link rel="stylesheet" href="sindie.css">
+  <script type="module" src="game.js"></script>
+</head>
+<body data-phase="idle">
+  <div class="sanctum" aria-hidden="true">
+    <div class="rose"></div>
+    <div class="beam"></div>
+    <div class="altar">
+      <svg class="inscription" viewBox="-100 -100 200 200">
+        <defs><path id="ring" d="M0,-82a82,82 0 1,1 0,164a82,82 0 1,1 0,-164"/></defs>
+        <circle r="92" class="ring-line"/><circle r="72" class="ring-line"/>
+        <text><textPath href="#ring">SVPERBIA ✠ AVARITIA ✠ LVXVRIA ✠ INVIDIA ✠ GVLA ✠ IRA ✠ ACEDIA ✠ MEMENTO MORI ✠</textPath></text>
+      </svg>
+      <div class="halo"></div>
+    </div>
+    <div class="candle left"><i></i></div>
+    <div class="candle right"><i></i></div>
+    <div class="grain"></div>
+  </div>
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <a class="room-return" href="../../" aria-label="返回饰品铺子菜单"><span aria-hidden="true">←</span> 饰品铺子</a>
+
+  <section class="plaque" aria-live="polite">
+    <svg class="emblem" viewBox="0 0 24 24" aria-hidden="true"><path id="emblem"/></svg>
+    <p class="numeral" id="numeral"></p>
+    <h1 class="latin" id="latin"></h1>
+    <p class="zh" id="zh"></p>
+  </section>
+  <button id="cast" class="cast" type="button" aria-label="掷骰"><span>掷</span></button>
+</body>
+</html>

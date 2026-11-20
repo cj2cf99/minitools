@@ -13,7 +13,7 @@ const url = 'https://example.test/api/reading';
 const post = (body, headers = {}) => new Request(url, {method:'POST', headers:{'Content-Type':'application/json', ...headers}, body:JSON.stringify(body)});
 
 test('小游戏入口与全套牌面、短片、正逆位释义齐全', async () => {
-  assert.deepEqual(TOOLS.filter(t => t.group === 'games').map(t => t.id), ['dice', 'magiccard']);
+  assert.deepEqual(TOOLS.filter(t => t.group === 'games').map(t => t.id), ['dice', 'magiccard', 'sindie']);
   assert.equal(major.length, 22);
   assert.equal(minor.length, 56);
   for (const [id, card] of [...major, ...minor].entries()) {
