@@ -36,6 +36,12 @@ const env = {
 
 async function dispatch(request) {
   const { pathname } = new URL(request.url);
+  // Local preview runs the development model on the minitools Worker.
+  if (pathname === '/api/tarot/reading') {
+    if (request.method === 'POST' && (request.headers.get('Origin') !== previewOrigin ||
+        request.headers.get('Sec-Fetch-Site') === 'cross-site')) return new Response(null,{status:403});
+    return handleMinitools(new Request(new URL('/minitools/api/reading',request.url),request),env);
+  }
   if (!['GET', 'HEAD'].includes(request.method) && pathname !== '/minitools/api/reading') {
     return new Response(null, { status: 405, headers: { Allow: 'GET, HEAD' } });
   }

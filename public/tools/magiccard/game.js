@@ -540,7 +540,7 @@ async function showReading() {
   window.scrollTo({top:0,behavior:"instant"});
   let answer;
   try {
-    const response = await fetch("../../api/reading", {
+    const response = await fetch("/api/tarot/reading", {
       method: "POST", signal: request.signal, headers: {"Content-Type":"application/json"},
       body: JSON.stringify({topic:current.question.topic,cards:current.picks.map(({card,orientation})=>({id:card.id,orientation}))}),
     });

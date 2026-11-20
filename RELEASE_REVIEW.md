@@ -222,3 +222,23 @@
 - 正式入口 https://myapp.cj2cf99.workers.dev/minitools/ ，塔罗页面 https://myapp.cj2cf99.workers.dev/minitools/tools/magiccard/ 。按本次决定优先提供抽牌及本地牌义，整局 AI 解读暂不可用。线上界面及交互待用户截图确认。花园和 Git 回执于下方补记。
 
 花园于 02:55:47 JST 登记成功，修订 88 → 89，项目 #19 新增「月下秘仪」#60、部署 #44、明细 #112，版本 0.0 → 1.0。生产加密快照 752009fcf926c1200863986cb4ccb30c3ed4d7c7 已独立推送并经远端克隆验证恢复。写入前 117/117 表与快照一致，写后 117/117 表与演练一致，完整性 ok、外键异常 0。小游戏发布源码 4a5812a61b31d7c93d3c00610d15616e2a51ceb4 已推送至 minitools/main，主站最终回执提交 54a573c1d8495e6e9cd321b0e58d3fb8121f46bf 与远端 main 一致。[主站执行回执](https://github.com/cj2cf99/cloudflaremyapp/blob/54a573c1d8495e6e9cd321b0e58d3fb8121f46bf/myapp/database/changes/minitools-magiccard-20261120/execution-receipt.json)。本补记随小游戏最终回执提交推送；线上交互待用户截图确认。
+
+## 2026-11-20 JST · 月下秘仪第一阶段收尾
+
+玩家继续从饰品铺子的「月下秘仪」进入占卜屋。选题、78 张牌、本地正逆位牌义及女巫的抽翻牌表演已发布。本次补齐翻完三张后听她回答的环节：页面提交当前问题、牌号和正逆位，主站使用塔罗自己的提示词和精灵的底层 Workers AI 客户端。回答直接显示正文，失败可用原牌阵重试，游戏无历史记录。第一阶段在此收尾。
+
+来源为 SampleProjects 的 f00114f。来源项目两轮回归见 magiccard/docs/reviews/READING_API_REVIEW_2026-11-20.md，覆盖本机真实模型、浏览器桌面流程、手机尺寸触控模拟、重试和取消。生产环境由 Cloudflare Workers myapp 与 minitools 共同提供。入口 /minitools/tools/magiccard/；专属接口 POST /api/tarot/reading。
+
+### 发布与验证
+
+先切换 myapp，再切换 minitools，新页面获得专属接口。业务数据库迁移、数据回填、绑定、Secret、依赖与既有 Access 策略的变更均为无。已有游戏页面可刷新到最新脚本。需恢复时先恢复 minitools，再恢复 myapp，回退版本分别为 090faa16-d674-4650-8c17-52bce7ed2526、bde3e92f-5770-4547-811e-46887d4e90f0。两者均在准备阶段从 Cloudflare 控制面核实为 100%。Worker 变更后核对实际版本与流量；受控页面效果和生产模型回答待用户截图确认。开发自测以隔离本机环境完成。
+
+用户已同意登记花园，并明确确认保持 1.0 的具体清单。生产结构已同步，D1 只读核对修订 89。项目 #19 的功能 #60 只有部署 #44 明细 #112，与该功能关联的种子、改善、缺陷均无。结果明确后，在 #112 的已有正文末尾仅追加一次带 JST 时间、两个 Worker 版本与真实结果的说明，原正文保留。花园按关联部署次数计算版本，维持一条明细即可保留 1.0，本次不新增花园部署对象，不改完成时间，不升级花园管理应用。仅元数据修订计数 89 → 90。主站 SQL 准备稿 database/changes/tarot-phase1-close/append.template.sql 已通过内存 SQLite 演练，重复执行被拒绝。生产写入前重新备份、独立提交推送并验证远端恢复，精确 SQL 先提交，再执行一次并后检。若发布失败，追加「发布中」和实际失败情况；旧值或修订变化时停止复核。
+
+第三方独立审核未执行。生产部署确认、生产写入及 Git 推送在本条准备记录时待执行。
+
+### 饰品铺子发布差异
+
+基线 955911d。比较 git diff 955911d -- public/tools/magiccard/game.js scripts/preview-tarot.mjs README.md docs/BUGS.md RELEASE_REVIEW.md；未提交文件另查 git status。game.js 把请求从旧的相对地址 ../../api/reading 切换至主站同源专属接口。scripts/preview-tarot.mjs 将该地址接回本机模型。README 更新接入和启动说明；docs/BUGS.md 的既有缺陷更新为本地已修、待线上确认。其它工具、牌面资源及旧 API 行为保持基线。重点核对工具目录里的路径解析、保留牌阵重试和全套资源。
+
+npm.cmd test 7/7；node node_modules/wrangler/bin/wrangler.js deploy --dry-run 成功读取 253 个静态资源。可在本项目根目录按 README「月下秘仪」启动隔离 Worker（8811）与本机预览（8812），无需初始化业务库。用于本机测试的 AI_BASE_URL/AI_MODEL 对应本机模型，生产使用主站已有绑定。

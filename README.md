@@ -48,4 +48,4 @@ node node_modules/wrangler/bin/wrangler.js dev --local --ip 127.0.0.1 --port 881
 node scripts/preview-tarot.mjs
 ```
 
-打开[饰品铺子菜单](http://127.0.0.1:8812/minitools/)或[全屏占卜屋](http://127.0.0.1:8812/minitools/tools/magiccard/)。本机模型沿用来源项目的 llama.cpp 配置，可用其 `start.ps1` 启动。生产 Worker 需要独立配置可达的兼容模型地址 `AI_BASE_URL` 和模型名 `AI_MODEL`，服务需要鉴权时使用 Secret `AI_API_KEY`。模型暂时不可用时可以回看单牌并在原牌阵重试。
+打开[饰品铺子菜单](http://127.0.0.1:8812/minitools/)或[全屏占卜屋](http://127.0.0.1:8812/minitools/tools/magiccard/)。本机预览使用来源项目的 llama.cpp，可用其 `start.ps1` 启动。第一阶段正式页面请求主站同源 `POST /api/tarot/reading`。主站负责 Access、牌阵校验和塔罗提示词，通过本地精灵的共享 Workers AI 客户端生成回答。模型暂时不可用时可以回看单牌并在原牌阵重试。接口来源为 SampleProjects 提交 `f00114f`。
