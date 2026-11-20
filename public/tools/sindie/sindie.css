@@ -129,3 +129,4 @@ body[data-phase="reveal"] .latin span { animation: carve .5s cubic-bezier(.2,.8,
 /* 矮的横屏：牌匾移到右侧，与左侧落点错开 */
 body[data-layout="side"] .plaque { left: 74%; bottom: auto; top: 40%; translate: -50% -50%; width: min(44vw, 420px); }
 body[data-layout="side"] .cast { left: 74%; }
+body[data-layout="side"] .latin { font-size: clamp(22px, 6vh, 40px); letter-spacing: .16em; }

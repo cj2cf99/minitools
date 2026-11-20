@@ -20,9 +20,11 @@ let W = 0, Ht = 0, DPR = 1, K = 60, CX = 0, CY = 0;
 function resize() {
   DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; Ht = innerHeight;
   canvas.width = W * DPR; canvas.height = Ht * DPR;
-  // 矮的横屏：骰子靠左、牌匾放右侧，避免牌匾压住落点
-  const side = W > Ht * 1.3 && Ht < 520;
-  K = Math.min(W, Ht) * (W < 600 ? .13 : .09); CX = side ? W * .36 : W / 2; CY = Ht * (side ? .44 : W < 600 ? .42 : .46);
+  K = Math.min(W, Ht) * (W < 600 ? .13 : .09);
+  // 居中时牌匾顶部（底距 + 按钮 + 牌匾高约 130）若碰到骰子下沿，就改左右布局：骰子靠左、牌匾和按钮放右
+  const centerY = Ht * (W < 600 ? .42 : .46), plaqueTop = Ht - Math.max(26, Ht * .05) - 112 - 130;
+  const side = W > Ht * .95 && plaqueTop < centerY + K * 1.6;
+  CX = side ? W * .36 : W / 2; CY = side ? Ht * .44 : centerY;
   document.body.dataset.layout = side ? 'side' : '';
   const root = document.documentElement.style;
   root.setProperty('--u', K + 'px'); root.setProperty('--cx', CX + 'px'); root.setProperty('--cy', CY + 'px'); root.setProperty('--sin', SP);

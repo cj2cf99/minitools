@@ -1,6 +1,6 @@
 # 告解骰 · 设计
 
-依据：[REQUIREMENTS.md](REQUIREMENTS.md)、全局规则 `C:/Users/asura/.claude/CLAUDE.md`、`G:/selftool/resourceforlater/docs/FRAMEWORK_PREFERENCES.md`、主站开发备忘 `G:/cloudflare/myapp/docs/design/development.md`（内存 KV 测试的适用边界）、掷骰台 `public/tools/dice/motion.js`（先定结果再演动画的做法）、月下秘仪（全屏游戏页的接入方式）。minitools 与 informationManage 没有专用的开发设计备忘录（2026-11-21 补记，审核第 7 项）。
+依据：[REQUIREMENTS.md](REQUIREMENTS.md)、全局规则 `C:/Users/asura/.claude/CLAUDE.md`、`G:/selftool/resourceforlater/docs/FRAMEWORK_PREFERENCES.md`、主站开发备忘 `G:/cloudflare/myapp/docs/design/development.md`（内存 KV 测试的适用边界）、掷骰台 `public/tools/dice/motion.js`（先定结果再演动画的做法）、月下秘仪（全屏游戏页的接入方式）。minitools 项目记忆 `C:/Users/asura/.claude/projects/G--selftool-minitools/memory/standalone-page-uses-main-shell.md`（索引见同目录 `MEMORY.md`）：饰品铺子菜单的页头、主题和动画必须经主站 `shell()`，不照抄样式。本功能的适用范围：菜单入口沿用主站代理和外壳；告解骰本身与月下秘仪一样是代理转发的独占全屏页，只保留返回菜单的链接。在 minitools 的 `README.md`、`docs/`、项目记忆，以及 informationManage 的 `api-worker/README.md`、`AUTOMATION_API.md` 中没有找到其他专用的开发设计备忘录；这一结论只限于上述检索范围（2026-11-21 补记，审核第 7 项及复审意见）。
 
 ## 目录
 
@@ -56,5 +56,5 @@ KV `kvforapi` 键 `sindie:hour:v1`，值 `{ hour, n }`。读到的 `hour` 等于
 
 - 剔面使用与投影相同的相机位置（`EYE = CAM × 16`），以「相机位置减面中心」判断可见（审核第 9 项）。
 - 起投点改到 y = −14（任何视口都在画外），收手终点即抛出起点（审核第 3 项）。
-- 矮横屏（宽 > 高 × 1.3 且高 < 520）时骰子落点左移到 36%，牌匾和按钮放到右侧 74%（审核第 4 项）。
+- 居中牌匾的顶部（视口高 − 底距 − 112 − 130）高于骰子下沿（落点 + 1.6 单位），且宽 > 高 × 0.95 时，改为左右布局：骰子落点左移到 36%，牌匾和按钮放到右侧 74%，拉丁名缩到 clamp(22px, 6vh, 40px)（审核第 4 项；复审后由宽高比门槛改为按实际空间判断）。
 - 开始下一掷时清空结果区及其可访问名称；投掷中按钮只标 `aria-disabled`，不再禁用，键盘焦点保持（审核第 5、10 项）。
