@@ -244,3 +244,11 @@
 npm.cmd test 7/7；node node_modules/wrangler/bin/wrangler.js deploy --dry-run 成功读取 253 个静态资源。可在本项目根目录按 README「月下秘仪」启动隔离 Worker（8811）与本机预览（8812），无需初始化业务库。用于本机测试的 AI_BASE_URL/AI_MODEL 对应本机模型，生产使用主站已有绑定。
 
 生产发布许可已收到。用户已明确确认立即依次部署 myapp、minitools，之后按核准清单备份、登记并同步 Git。使用 --keep-vars 保留现有配置。 已验证代码提交 9cefb0b。
+
+### 第一阶段发布结果 · 2026-11-20 JST
+
+09:19:31 主站 myapp 已部署 e1221b6，Worker 版本 cea49dab-413b-4f11-95e3-1140e10040ec。09:20:22 饰品铺子 minitools 已部署 adac108，Worker 版本 b87ab3e1-888a-421b-9559-1eff2d27b397。Cloudflare 控制面确认两者承接 100% 流量。游戏入口 https://myapp.cj2cf99.workers.dev/minitools/tools/magiccard/ 。生产模型回答与受控页面效果待用户截图确认。
+
+花园已于 09:25:54 仅写入一次。加密备份 3342240 已独立推送并从远端完整恢复，117/117 表验证通过。执行前核对生产与备份一致，精确 SQL 525fa25 已先提交。09:26:20 后检确认 117/117 表与演练一致，其中 115 张未变。项目 #19「饰品铺子」下 #60「月下秘仪」的原部署 #44 / 明细 #112 已追加本次说明，原文与历史版本快照保留，功能依然是 1.0。花园修订号 89 → 90。业务数据无变更。
+
+来源主分支 1726984、主站含精确 SQL 的 525fa25、饰品铺子发布来源 adac108 已推送并核对远端 main。此回执随最终同步纳入版本管理。完整执行证据在主站 database/changes/tarot-phase1-close/execution-receipt.json。
