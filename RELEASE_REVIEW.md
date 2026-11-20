@@ -242,3 +242,5 @@
 基线 955911d。比较 git diff 955911d -- public/tools/magiccard/game.js scripts/preview-tarot.mjs README.md docs/BUGS.md RELEASE_REVIEW.md；未提交文件另查 git status。game.js 把请求从旧的相对地址 ../../api/reading 切换至主站同源专属接口。scripts/preview-tarot.mjs 将该地址接回本机模型。README 更新接入和启动说明；docs/BUGS.md 的既有缺陷更新为本地已修、待线上确认。其它工具、牌面资源及旧 API 行为保持基线。重点核对工具目录里的路径解析、保留牌阵重试和全套资源。
 
 npm.cmd test 7/7；node node_modules/wrangler/bin/wrangler.js deploy --dry-run 成功读取 253 个静态资源。可在本项目根目录按 README「月下秘仪」启动隔离 Worker（8811）与本机预览（8812），无需初始化业务库。用于本机测试的 AI_BASE_URL/AI_MODEL 对应本机模型，生产使用主站已有绑定。
+
+生产发布许可已收到。用户已明确确认立即依次部署 myapp、minitools，之后按核准清单备份、登记并同步 Git。使用 --keep-vars 保留现有配置。 已验证代码提交 9cefb0b。
