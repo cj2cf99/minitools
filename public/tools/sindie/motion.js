@@ -64,7 +64,8 @@ export function planRoll(history, from, fromQ, rand = Math.random) {
   const face = faces.filter(f => f.sin === sin)[rand() < .5 ? 0 : 1];
   const side = rand() < .5 ? -1 : 1;
   const end = [(rand() - .5) * .7, (rand() - .5) * .5, 0];
-  const start = [side * (2.4 + rand()), -8, 1.4];
+  // 起投点远在镜头下方（任何视口都在画外）；收手也收到这里，两段在同一点交接
+  const start = [side * (2.4 + rand()), -14, 1.4];
   const dir = unit([end[0] - start[0], end[1] - start[1], 0]);
   return {
     sin, face, from, fromQ, start, end,
@@ -79,7 +80,10 @@ export function planRoll(history, from, fromQ, rand = Math.random) {
 export function sample(plan, t) {
   if (t < GATHER) { // 收回手中：加速向镜头下方离场
     const s = easeIn(t / GATHER);
-    return { pos: add(plan.from, mul(sub([plan.from[0] * .5, -7.5, 2.4], plan.from), s)), quat: qmul(qaxis([1, 0, 0], -s * 2.2), plan.fromQ), landed: 0 };
+    const handoff = sample(plan, GATHER).pos, quat = qmul(qaxis([1, 0, 0], -s * 2.2), plan.fromQ);
+    const pos = add(plan.from, mul(sub(handoff, plan.from), s));
+    pos[2] = Math.max(pos[2], -lowest(qmat(quat))); // 转动时不让棱角穿进桌面
+    return { pos, quat, landed: 0 };
   }
   t -= GATHER;
   let reach = 1, height = 0, acc = 0, prev = 0, landed = FLIGHTS.length;

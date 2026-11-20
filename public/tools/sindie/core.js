@@ -10,18 +10,22 @@ export const FACES = [
   { n: 7, numeral: 'VII', latin: 'ACEDIA', zh: '懒惰' },
 ];
 
-function uniform(limit) {
-  const word = new Uint32Array(1);
+// 32 位随机字（页面用）。
+export const cryptoWord = () => crypto.getRandomValues(new Uint32Array(1))[0];
+
+// 用 32 位随机字取 0..limit-1 的等概率整数，拒绝采样无取模偏差。
+function uniform(limit, word) {
   const cutoff = 2 ** 32 - (2 ** 32 % limit);
-  do crypto.getRandomValues(word); while (word[0] >= cutoff);
-  return word[0] % limit;
+  let w;
+  do w = word(); while (w >= cutoff);
+  return w % limit;
 }
 
-// history：最近的结果下标（0–6），只看最后两项。返回新的下标。
-export function nextFace(history = []) {
+// history：最近的结果下标（0–6），只看最后两项。word：随机字来源，API 传入按小时确定的来源。
+export function nextFace(history = [], word = cryptoWord) {
   const [a, b] = history.slice(-2);
-  const face = uniform(7);
+  const face = uniform(7, word);
   if (history.length < 2 || a !== b || face !== a) return face;
-  const other = uniform(6);
+  const other = uniform(6, word);
   return other >= a ? other + 1 : other;
 }

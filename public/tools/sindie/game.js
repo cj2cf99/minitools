@@ -1,5 +1,5 @@
 import { FACES } from './core.js';
-import { add, mul, dot, unit, apply, qmat, verts, faces, restPose, restOn, planRoll, sample } from './motion.js';
+import { add, sub, mul, dot, unit, apply, qmat, verts, faces, restPose, restOn, planRoll, sample } from './motion.js';
 
 // 告解骰：点击后先定结果（不显示），整段动画收束到结果面朝上，落定后再揭示。
 const EMBLEMS = [
@@ -14,14 +14,18 @@ const EMBLEMS = [
 
 // ---------- 画布与镜头 ----------
 const canvas = document.getElementById('stage'), ctx = canvas.getContext('2d');
-const PHI = 62 * Math.PI / 180, SP = Math.sin(PHI), CP = Math.cos(PHI), CAM = [0, -CP, SP], LIGHT = unit([.15, .35, 1]);
+// 镜头位于 CAM 方向 16 个单位处；投影与剔面共用这个相机位置
+const PHI = 62 * Math.PI / 180, SP = Math.sin(PHI), CP = Math.cos(PHI), CAM = [0, -CP, SP], EYE = mul(CAM, 16), LIGHT = unit([.15, .35, 1]);
 let W = 0, Ht = 0, DPR = 1, K = 60, CX = 0, CY = 0;
 function resize() {
   DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; Ht = innerHeight;
   canvas.width = W * DPR; canvas.height = Ht * DPR;
-  K = Math.min(W, Ht) * (W < 600 ? .13 : .09); CX = W / 2; CY = Ht * (W < 600 ? .42 : .46);
+  // 矮的横屏：骰子靠左、牌匾放右侧，避免牌匾压住落点
+  const side = W > Ht * 1.3 && Ht < 520;
+  K = Math.min(W, Ht) * (W < 600 ? .13 : .09); CX = side ? W * .36 : W / 2; CY = Ht * (side ? .44 : W < 600 ? .42 : .46);
+  document.body.dataset.layout = side ? 'side' : '';
   const root = document.documentElement.style;
-  root.setProperty('--u', K + 'px'); root.setProperty('--cy', CY + 'px'); root.setProperty('--sin', SP);
+  root.setProperty('--u', K + 'px'); root.setProperty('--cx', CX + 'px'); root.setProperty('--cy', CY + 'px'); root.setProperty('--sin', SP);
 }
 addEventListener('resize', resize); resize();
 function project(p) {
@@ -63,7 +67,7 @@ function reveal() {
   latin.setAttribute('aria-label', f.latin);
   document.getElementById('zh').textContent = f.zh;
   document.body.dataset.phase = 'reveal';
-  cast.disabled = false;
+  cast.removeAttribute('aria-disabled');
 }
 
 // ---------- 绘制 ----------
@@ -105,7 +109,7 @@ function draw(now) {
   ctx.lineJoin = 'round';
   for (const f of faces) {
     const n = apply(m, f.n);
-    if (dot(n, CAM) <= 0) continue;
+    if (dot(n, sub(EYE, add(apply(m, f.c), pos))) <= 0) continue;
     const lam = Math.max(0, dot(n, LIGHT)), spec = Math.max(0, dot(n, unit(add(LIGHT, CAM)))) ** 24, l = .22 + .78 * lam;
     const col = mat.lit.map((c, i) => Math.min(255, Math.round(mat.shade[i] + (c - mat.shade[i]) * l + 128 * spec)));
     ctx.beginPath();
@@ -153,9 +157,13 @@ function frame(now) {
 
 // ---------- 交互 ----------
 const cast = document.getElementById('cast');
+// 投掷中不禁用按钮（禁用会让键盘焦点丢到 body），只标记 aria-disabled 并忽略点击
 cast.addEventListener('click', () => {
   if (plan) return;
-  cast.disabled = true; top = null; glow = 0; t = 0; landed = 0;
+  cast.setAttribute('aria-disabled', 'true'); top = null; glow = 0; t = 0; landed = 0;
+  for (const id of ['numeral', 'latin', 'zh']) document.getElementById(id).replaceChildren();
+  document.getElementById('latin').removeAttribute('aria-label');
+  document.getElementById('emblem').removeAttribute('d');
   document.body.dataset.phase = 'rolling';
   plan = planRoll(history, pos, quat); // 结果在此刻已定
   history.push(plan.sin); if (history.length > 2) history.shift();

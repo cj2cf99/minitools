@@ -44,3 +44,12 @@ test('every throw ends resting on the decided face, touching the table', () => {
     q = s.quat; pos = s.pos;
   }
 });
+
+test('gather hands off to the throw at the same point, far below the camera', () => {
+  for (let n = 0; n < 200; n++) {
+    const q = restPose(faces[n % 14], .1), plan = planRoll([], restOn(q), q);
+    const a = sample(plan, GATHER - 1e-6).pos, b = sample(plan, GATHER + 1e-6).pos;
+    assert.ok(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) < 1e-3);
+    assert.ok(b[1] <= -13.9);
+  }
+});
