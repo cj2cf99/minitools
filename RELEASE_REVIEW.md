@@ -315,3 +315,5 @@ npm.cmd test 7/7；node node_modules/wrangler/bin/wrangler.js deploy --dry-run �
 小时 API 于 05:10:40 JST 发布 `ad4ecb1`，Worker 版本 `7cc4d0be-c772-4202-a165-94a176ce501d`，部署编号 `3a150b62-1cc4-4a86-8978-0aa173639ffb`；饰品铺子于 05:11:14 JST 发布 `c9e9867`，Worker 版本 `6cfab801-a24e-4beb-8bfb-6374e255196a`，部署编号 `1335eed3-6f77-4d3d-a07a-ca03564d0f96`。Cloudflare 控制面分别回读单版本 100% 流量，并将全部 14 项与 2 项绑定逐项与回退版本比对，一致。主站无部署，业务库无迁移或回填。受控线上效果待用户截图确认。
 
 绯月已依据真实结果在花园修订 106 生成批次 `sindie-release-20261121` 精确清单及三步 SQL，确认摘要 `c95bd18706a975f8254ae485627ab05c5708a7de9803cae026b071fcde2fa455`。该编号生成时尚未入队；具体登记确认与最终回读回执另记。
+
+用户随后明确选择“暂缓登记”。截至收尾，未向绯月提交批次、未提交花园正式 SQL、未写生产花园。精确清单与 SQL 留在调用方私有草案目录；将来恢复时先核对修订号、编号和版本，再确认具体清单。发布回执已提交并普通推送：minitools 976f117、informationManage a68066e，已回读两个远端 main 与本地一致。此补记随两仓 Git 同步。
