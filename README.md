@@ -57,3 +57,5 @@ node scripts/preview-tarot.mjs
 - 内核 `public/tools/sindie/core.js` 原样复制到 subscriptions-api（`G:/selftool/informationManage/api-worker/src/sin-die-core.js`），供 `GET /api/v1/sin-die` 每个东京整点出一次结果，缓存在 KV `kvforapi` 的 `sindie:hour:v1`。
 - 需求与设计：`docs/sindie/`；审核：`docs/reviews/SINDIE_*`。
 - 本页纯静态，可用 `.claude/launch.json` 的 `static` 配置预览（`python -m http.server 8798 --bind 127.0.0.1 --directory public`），不连任何线上数据。
+
+正式本地验收使用隔离的游戏 Worker、主站菜单外壳和小时 API Worker。工作目录、初始化、三个终端的启动命令和验收步骤见[告解骰本地验收](docs/sindie/LOCAL_ACCEPTANCE.md)。

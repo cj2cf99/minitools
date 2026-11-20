@@ -1,0 +1,9 @@
+{
+  "name": "sindie-api-local",
+  "main": "api-preview.mjs",
+  "compatibility_date": "2026-10-27",
+  "dev": { "ip": "127.0.0.1", "port": 8813, "inspector_port": 9233 },
+  "vars": { "API_ENABLED": "true", "ACCESS_AUD": "sindie-local-only", "WEBSITE_ORIGIN": "http://127.0.0.1:8813" },
+  "kv_namespaces": [{ "binding": "kvforapi", "id": "00000000000000000000000000000001" }],
+  "d1_databases": [{ "binding": "APIDB", "database_name": "sindie-local-empty", "database_id": "00000000-0000-0000-0000-000000000001" }]
+}
