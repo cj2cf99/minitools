@@ -265,3 +265,9 @@ npm.cmd test 7/7；node node_modules/wrangler/bin/wrangler.js deploy --dry-run �
 
 饰品铺子生产基线 126a08e，回退版本 b87ab3e1-888a-421b-9559-1eff2d27b397。按 git diff 126a08e -- public/tools/magiccard/assets/salon docs/BUGS.md RELEASE_REVIEW.md 复查。覆盖 seatdeal.webp 与 arm/base/grip/head 四个分层，五个文件与来源逐项核对。原画为去牌后补绘的完整绣花衣身，制作脚本保留了人物双手、手指遮挡和运行时飞牌。更新 docs/BUGS.md 中上次发布后的实际反馈。已用真实本机浏览器在 1280×800 与 390×844 走完发七张牌，核对持牌、牌落桌、选牌恢复及衣料图。npm.cmd test 7/7，Wrangler deploy --dry-run 通过，253 个资源。无需静态页改动。
 用户已针对本次热修明确确认现在发布，完成花园单次登记与 Git 同步。
+
+### 热修发布结果
+
+2026-11-20 09:42:57 JST，myapp 已发布 bd25736，版本 812ddf78-5b4a-465b-b6d4-97cd3fdd4881。09:43:43 JST，minitools 已发布 4bed6c8，版本 7960c4e8-152d-4b94-b15b-b45135b8ee9b。控制面均确认 100% 流量。线上实际用户复验待截图确认。
+
+09:48:40 在 #112 追加热修说明一次。备份 3275aa2 已独立推送，远端恢复 117/117，写前生产与备份一致，精确 SQL 为 58a11ef。09:48:56 后检 117/117 表与演练一致，115 张未变，修订 90 → 91，花园功能版本仍为 1.0。两个来源 main 已同步 9bcbb56、c83b270；主站和饰品铺子发布代码已推送并核对，最终回执随版本管理同步。详见主站 database/changes/tarot-503-costume/execution-receipt.json。
