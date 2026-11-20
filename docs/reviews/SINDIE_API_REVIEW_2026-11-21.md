@@ -67,3 +67,16 @@
 - 三轮检查：
   - 第 1 轮：浏览器缓存了旧的 `tools/index.js`，是测试环境问题，强制刷新后正常。`test/tarot.test.js` 写死了小游戏列表 `['dice','magiccard']`，加入口后失败（12/13），这是预期内的变化，已把 `sindie` 加进列表，复测 13/13。
   - 第 2、3 轮：无需求偏移，也没有可删减的内容。
+
+## 补记：Git 提交（2026-11-21 JST）
+
+- 用户指示「先提交代码到git」。
+- minitools：提交 `5502b69`（告解骰页面、内核、图标、文档、测试）。
+- informationManage：本地 `main` 落后 `origin/main` 19 个提交。逐文件比对发现，本地未提交的 companion 改动是 11-20 19:49 JST 的旧集成副本：
+  - 大部分文件在远端历史里有完全相同的版本。
+  - 其余几个是远端已经更新过的旧版本。
+  - 远端没有的随手记附图已提交在源项目 `WebCharacter/personal-digital-companion` 的 `2fa1b29`。
+  - 原样提交会把远端功能退回去，所以没有提交，改为保存在 `git stash`（`stale companion integration snapshot …`），可以随时恢复。
+- 之后快进到 `09c1caf`，恢复告解骰 API 改动，没有冲突。
+- 内核哈希测试因为 Windows 检出时换成了 CRLF 而失败，改为统一成 LF 后再比对，复测 39/39 通过。dry-run 绑定与线上一致。
+- 提交为 `18551a7`，本地领先远端 1 个提交。两个仓库都还没有推送。
